@@ -695,5 +695,5 @@ DEF OMNI_WHEELS Robot {
   boundingObject USE BODY_TRANS
   physics Physics {
   }
-  controller "omni_wheels"
+  controller "omni_wheel_controller"
 }
