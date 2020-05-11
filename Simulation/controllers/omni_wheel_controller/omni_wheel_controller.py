@@ -1,97 +1,100 @@
-"""omni_wheels controller."""
+"""omni_controller controller."""
 
-# You may need to import some classes of the controller module. Ex:
-#  from controller import Robot, Motor, DistanceSensor
-from controller import Robot, Motor
-MAX_SPEED = 6.28
+from controller import Robot
+from enum import Enum, auto
+from threading import Timer
+
+STATE_CHANGE_INTERVAL = 1
+SPEED_FACTOR = 4.0
 
 
+class Direction(Enum):
+    STATIONARY = auto()
+    NORTH = auto()
+    EAST = auto()
+    SOUTH = auto()
+    WEST = auto()
 
-###Setup###
-# create the Robot instance.
+
+DIRECTION_ORDER = [
+    Direction.STATIONARY,
+    Direction.NORTH,
+    Direction.EAST,
+    Direction.SOUTH,
+    Direction.WEST
+]
+
+
+direction_index = 0
+move_direction = DIRECTION_ORDER[direction_index]
+
+
 robot = Robot()
 
-# get the time step of the current world.
+wheels = [
+    robot.getMotor("wheel1"),
+    robot.getMotor("wheel2"),
+    robot.getMotor("wheel3")
+]
+
+for wheel in wheels:
+    wheel.setPosition(float('inf'))
+    wheel.setVelocity(0.0)
+
 timestep = int(robot.getBasicTimeStep())
-#init wheels and put in list
-wheels = []
-wheelsNames = ['wheel1','wheel2','wheel3']
-for name in wheelsNames:
-    wheels.append(robot.getMotor(name))
-#set wheel params
-for wheelNum in range(3):
-    wheels[wheelNum].setPosition(float('inf'))
-    wheels[wheelNum].setVelocity(0.0)
-# You should insert a getDevic-like function in order to get the
-# instance of a device of the robot. Something like:
-#  motor = robot.getMotor('motorname')
-#  ds = robot.getDistanceSensor('dsname')
-#  ds.enable(timestep)
 
-###Functions###
-def moveEast(velocity, pos):
-    wheels[0].setPosition(pos * -1.0)
-    wheels[1].setPosition(pos * 0.5)
-    wheels[2].setPosition(pos * 0.5)
-    
-    wheels[0].setVelocity(velocity*2)
-    wheels[1].setVelocity(velocity*1)
-    wheels[2].setVelocity(velocity*1)
-    
-def moveSouth(velocity, pos):
-    # wheels[0].setVelocity(0.0)
-    # wheels[1].setVelocity(1.0)
-    # wheels[2].setVelocity(-1.0)
-    wheels[0].setPosition(pos * 0.0)
-    wheels[1].setPosition(pos * 0.5)
-    wheels[2].setPosition(pos * -0.5)
-    
-    wheels[0].setVelocity(velocity*1)
-    wheels[1].setVelocity(velocity*1)
-    wheels[2].setVelocity(velocity*1)    
-    
 
-def moveWest(velocity, pos):
-    # wheels[0].setVelocity(2.0)
-    # wheels[1].setVelocity(-1.0)
-    # wheels[2].setVelocity(-1.0)
-    wheels[0].setPosition(pos * 1.0)
-    wheels[1].setPosition(pos * -0.5)
-    wheels[2].setPosition(pos * -0.5)
-    
-    wheels[0].setVelocity(velocity*2)
-    wheels[1].setVelocity(velocity*1)
-    wheels[2].setVelocity(velocity*1)    
-        
-def moveNorth(velocity, pos):
-    # wheels[0].setVelocity(0.0)
-    # wheels[1].setVelocity(-1.0)
-    # wheels[2].setVelocity(1.0)
-    wheels[0].setPosition(pos * 0.0)
-    wheels[1].setPosition(pos * -0.5)
-    wheels[2].setPosition(pos * 0.5)
-    
-    wheels[0].setVelocity(velocity*1)
-    wheels[1].setVelocity(velocity*1)
-    wheels[2].setVelocity(velocity*1)    
+def freezeWheels():
+    for wheel in wheels:
+        wheel.setVelocity(0)
 
-    
 
-#### Main loop: ###
-# - perform simulation steps until Webots is stopping the controller
+def moveNorth():
+    wheels[0].setVelocity(0)
+    wheels[1].setVelocity(-SPEED_FACTOR)
+    wheels[2].setVelocity(SPEED_FACTOR)
+
+
+def moveEast():
+    wheels[0].setVelocity(-2 * SPEED_FACTOR)
+    wheels[1].setVelocity(SPEED_FACTOR)
+    wheels[2].setVelocity(SPEED_FACTOR)
+
+
+def moveSouth():
+    wheels[0].setVelocity(0)
+    wheels[1].setVelocity(SPEED_FACTOR)
+    wheels[2].setVelocity(-SPEED_FACTOR)
+
+
+def moveWest():
+    wheels[0].setVelocity(2 * SPEED_FACTOR)
+    wheels[1].setVelocity(-SPEED_FACTOR)
+    wheels[2].setVelocity(-SPEED_FACTOR)
+
+
+direction_map = {
+    Direction.STATIONARY: freezeWheels,
+    Direction.NORTH: moveNorth,
+    Direction.EAST: moveEast,
+    Direction.SOUTH: moveSouth,
+    Direction.WEST: moveWest
+}
+
+
+def move(direction):
+    move_func = direction_map[direction]
+    move_func()
+
+
+def increment_state():
+    global move_direction, direction_index
+    direction_index = (direction_index + 1) % len(DIRECTION_ORDER)
+    move_direction = DIRECTION_ORDER[direction_index]
+    Timer(STATE_CHANGE_INTERVAL, increment_state).start()
+
+
+Timer(STATE_CHANGE_INTERVAL, increment_state).start()
+
 while robot.step(timestep) != -1:
-    # Read the sensors:
-    # Enter here functions to read sensor data, like:
-    #  val = ds.getValue()
-
-    # Process sensor data here.
-
-    # Enter here functions to send actuator commands, like:
-    #  motor.setPosition(10.0)
-    moveEast(2, 10.0)
-    moveNorth(2, 10.0)
-    moveWest(2, 10.0)
-    moveSouth(2, 10.0)
-    pass
-
-# Enter here exit cleanup code.
+    move(move_direction)
