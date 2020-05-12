@@ -743,10 +743,10 @@ DEF OMNI_WHEELS Robot {
       ]
       name "ds0"
       lookupTable [
-        0 1024 0
-        0.05 1024 0
-        0.15 0 0
+        0 0 0
+        1 1000 0
       ]
+      type "sonar"
       numberOfRays 2
       aperture 1
     }
@@ -773,16 +773,16 @@ DEF OMNI_WHEELS Robot {
       ]
       name "ds1"
       lookupTable [
-        0 1024 0
-        0.05 1024 0
-        0.15 0 0
+        0 0 0
+        1 1000 0
       ]
+      type "sonar"
       numberOfRays 2
       aperture 1
     }
     DistanceSensor {
       translation 0.1 0.08 -1.06144e-07
-      rotation 0 -1 0 -5.307179586466759e-06
+      rotation 0 1 0 5.307156870259904e-06
       children [
         DEF SENSOR Transform {
           rotation 0 0 1 1.57
@@ -803,10 +803,10 @@ DEF OMNI_WHEELS Robot {
       ]
       name "ds2"
       lookupTable [
-        0 1024 0
-        0.05 1024 0
-        0.15 0 0
+        0 0 0
+        1 1000 0
       ]
+      type "sonar"
       numberOfRays 2
       aperture 1
     }
@@ -833,10 +833,10 @@ DEF OMNI_WHEELS Robot {
       ]
       name "ds3"
       lookupTable [
-        0 1024 0
-        0.05 1024 0
-        0.15 0 0
+        0 0 0
+        1 1000 0
       ]
+      type "sonar"
       numberOfRays 2
       aperture 1
     }
@@ -863,10 +863,10 @@ DEF OMNI_WHEELS Robot {
       ]
       name "ds4"
       lookupTable [
-        0 1024 0
-        0.05 1024 0
-        0.15 0 0
+        0 0 0
+        1 1000 0
       ]
+      type "sonar"
       numberOfRays 2
       aperture 1
     }
@@ -893,10 +893,10 @@ DEF OMNI_WHEELS Robot {
       ]
       name "ds5"
       lookupTable [
-        0 1024 0
-        0.05 1024 0
-        0.15 0 0
+        0 0 0
+        1 1000 0
       ]
+      type "sonar"
       numberOfRays 2
       aperture 1
     }
@@ -923,10 +923,10 @@ DEF OMNI_WHEELS Robot {
       ]
       name "ds6"
       lookupTable [
-        0 1024 0
-        0.05 1024 0
-        0.15 0 0
+        0 0 0
+        1 1000 0
       ]
+      type "sonar"
       numberOfRays 2
       aperture 1
     }
@@ -953,10 +953,10 @@ DEF OMNI_WHEELS Robot {
       ]
       name "ds7"
       lookupTable [
-        0 1024 0
-        0.05 1024 0
-        0.15 0 0
+        0 0 0
+        0 1000 0
       ]
+      type "sonar"
       numberOfRays 2
       aperture 1
     }
@@ -965,4 +965,35 @@ DEF OMNI_WHEELS Robot {
   physics Physics {
   }
   controller "omni_wheel_controller"
+}
+SolidBox {
+  translation -1.09731 0.2377375001039332 -1.15256
+  rotation -0.3520310156358334 0.318649790868044 -0.8800775390896846 2.232199401272946e-18
+  size 0.5 0.5 0.5
+  physics Physics {
+  }
+}
+SolidBox {
+  translation 1.21269 0.2377375001039332 -1.15256
+  rotation -0.3520310156358334 0.318649790868044 -0.8800775390896846 2.232199401272946e-18
+  name "box(1)"
+  size 0.5 0.5 0.5
+  physics Physics {
+  }
+}
+SolidBox {
+  translation 0.62269 0.23773750000000007 0.06744
+  rotation -0.7005929531808247 0.07054384850712524 0.7100655458414911 3.60049804085859e-18
+  name "box(2)"
+  size 0.5 0.5 0.5
+  physics Physics {
+  }
+}
+SolidBox {
+  translation -1.02731 0.2377375001039332 1.14744
+  rotation -0.3520310156358334 0.318649790868044 -0.8800775390896846 2.232199401272946e-18
+  name "box(3)"
+  size 0.5 0.5 0.5
+  physics Physics {
+  }
 }
