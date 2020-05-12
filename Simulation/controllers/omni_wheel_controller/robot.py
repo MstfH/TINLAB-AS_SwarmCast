@@ -1,4 +1,4 @@
-from controller import Robot, LED
+from controller import Robot, LED, Emitter, Receiver
 
 # Here we are essentially just initializing the robot, its sensors and actuators
 robot = Robot()
@@ -8,6 +8,10 @@ led = robot.getLED("led")
 
 accelerometer = robot.getAccelerometer("accelerometer")
 accelerometer.enable(timestep)
+
+transmitter = robot.getEmitter("transmitter")
+receiver = robot.getReceiver("receiver")
+receiver.enable(100) #sampling period
 
 # Create an iterable list of the motors/wheels
 wheels = [
