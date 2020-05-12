@@ -691,6 +691,35 @@ DEF OMNI_WHEELS Robot {
         }
       ]
     }
+    LED {
+      translation 0 0.11 0
+      children [
+        Group {
+          children [
+            Shape {
+              appearance PBRAppearance {
+                baseColor 0.74902 0.74902 0.74902
+                roughness 1
+                metalness 0
+              }
+              geometry Box {
+                size 0.1 0.01 0.1
+              }
+            }
+            PointLight {
+              attenuation 0 0 1
+              color 1 0 0
+              intensity 0.5
+              location 0 0.03 0
+              on FALSE
+              castShadows TRUE
+            }
+          ]
+        }
+      ]
+      color []
+      gradual TRUE
+    }
     DistanceSensor {
       translation 0 0.08 -0.1
       rotation 0 1 0 1.5708
