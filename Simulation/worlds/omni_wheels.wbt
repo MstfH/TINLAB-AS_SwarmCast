@@ -7,8 +7,8 @@ WorldInfo {
   basicTimeStep 8
 }
 Viewpoint {
-  orientation 1 0 0 4.71238898038469
-  position 0.0001231731438619889 8.92237093488225 5.834446268327524e-07
+  orientation 0.9987741398521947 -0.03939395647277012 -0.029972216400031466 4.981206614178697
+  position -0.008079074218068312 0.6694298320560687 0.19840369925968604
 }
 TexturedBackground {
 }
@@ -757,6 +757,30 @@ DEF OMNI_WHEELS Robot {
     }
     LED {
       translation 0 0.11 0
+    Emitter {
+      translation -0.07 0.15 0
+      children [
+        DEF antenna Shape {
+          appearance PBRAppearance {
+            baseColor 0 0 0
+          }
+          geometry Capsule {
+            height 0.1
+            radius 0.01
+          }
+        }
+      ]
+      name "transmitter"
+    }
+    Receiver {
+      translation 0.07 0.15 0
+      children [
+        USE antenna
+      ]
+    }
+    DistanceSensor {
+      translation 0 0.08 -0.1
+      rotation 0 1 0 1.5708
       children [
         Group {
           children [
