@@ -1,6 +1,6 @@
 """omni_controller controller."""
 
-from controller import Robot
+from controller import Robot, Emitter, Receiver
 from enum import Enum, auto
 from threading import Timer
 
@@ -30,6 +30,10 @@ move_direction = DIRECTION_ORDER[direction_index]
 
 
 robot = Robot()
+
+transmitter = robot.getEmitter("transmitter")
+receiver = robot.getReceiver("receiver")
+receiver.enable(100) #sampling period
 
 wheels = [
     robot.getMotor("wheel1"),
@@ -93,8 +97,14 @@ def increment_state():
     move_direction = DIRECTION_ORDER[direction_index]
     Timer(STATE_CHANGE_INTERVAL, increment_state).start()
 
-
+###Timer freezes this code. Disabling breaks movement
+""""
 Timer(STATE_CHANGE_INTERVAL, increment_state).start()
-
+"""
 while robot.step(timestep) != -1:
     move(move_direction)
+    transmitter.send("Hello from omnibot".encode())
+    if receiver.getQueueLength() != 0:
+        print("rx:", receiver.getData()," strength:", receiver.getSignalStrength(), " direction:", receiver.getEmitterDirection())
+
+    
