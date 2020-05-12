@@ -1,8 +1,10 @@
 """omni_controller controller."""
 
-from controller import Robot
+from controller import Robot, LED
 from enum import Enum, auto
 from threading import Timer
+import random
+
 
 STATE_CHANGE_INTERVAL = 1
 SPEED_FACTOR = 4.0
@@ -30,6 +32,10 @@ move_direction = DIRECTION_ORDER[direction_index]
 
 
 robot = Robot()
+
+led = robot.getLED("led")
+led.set(int("0xff0000", 16))
+
 
 wheels = [
     robot.getMotor("wheel1"),
@@ -96,5 +102,8 @@ def increment_state():
 
 Timer(STATE_CHANGE_INTERVAL, increment_state).start()
 
+
 while robot.step(timestep) != -1:
     move(move_direction)
+    led.set(random.randint(16, (int("0xffffff",16))))
+    
