@@ -5,6 +5,7 @@ import random
 import robot
 import state_machine
 import jobs
+import lidarLogic as collision
 
 
 def readSensors():
@@ -12,6 +13,10 @@ def readSensors():
     dsValues = []
     for i in range(8):
         dsValues.append(robot.ds[i].getValue())
+    #lidar.getRangeImage() for all layers
+    #lidar.getLayerRangeImage(3) for layer 3 of the n layers
+    #where layer 1 is the lowest and top layer the highest
+    collision.lidarPoint(robot.lidar.getRangeImage())
     return dsValues
 
 

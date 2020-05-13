@@ -7,8 +7,8 @@ WorldInfo {
   basicTimeStep 8
 }
 Viewpoint {
-  orientation 1 0 0 4.71238898038469
-  position 0.0001231731438619889 8.92237093488225 5.834446268327524e-07
+  orientation 0.31171677535583414 0.9018207441213779 0.2992523975411472 4.6498978307177055
+  position -2.8317083024669065 2.0912279472120243 0.016458406524991753
 }
 TexturedBackground {
 }
@@ -20,6 +20,10 @@ RectangleArena {
 DEF OMNI_WHEELS Robot {
   translation 0 0.06 0
   children [
+    VelodynePuck {
+      translation 0 0.14 0
+      version "Puck LITE"
+    }
     DEF SKIRT Transform {
       children [
         DEF SUPPORT Solid {
@@ -756,7 +760,7 @@ DEF OMNI_WHEELS Robot {
       ]
     }
     LED {
-      translation 0 0.11 0
+      translation 0 0.18 0
       children [
         Group {
           children [
@@ -772,7 +776,7 @@ DEF OMNI_WHEELS Robot {
             }
             PointLight {
               attenuation 0 0 1
-              color 1 0 0
+              color 0.43921568989753723 0.7529411911964417 0.5137255191802979
               intensity 0.5
               location 0 0.03 0
               on FALSE
@@ -813,7 +817,6 @@ DEF OMNI_WHEELS Robot {
             0 0 0
             1 1000 0
           ]
-      type "generic"
           numberOfRays 2
           aperture 1
         }
@@ -843,7 +846,6 @@ DEF OMNI_WHEELS Robot {
             0 0 0
             1 1000 0
           ]
-      type "generic"
           numberOfRays 2
           aperture 1
         }
@@ -873,7 +875,6 @@ DEF OMNI_WHEELS Robot {
             0 0 0
             1 1000 0
           ]
-      type "generic"
           numberOfRays 2
           aperture 1
         }
@@ -903,7 +904,6 @@ DEF OMNI_WHEELS Robot {
             0 0 0
             1 1000 0
           ]
-      type "generic"
           numberOfRays 2
           aperture 1
         }
@@ -933,7 +933,6 @@ DEF OMNI_WHEELS Robot {
             0 0 0
             1 1000 0
           ]
-      type "generic"
           numberOfRays 2
           aperture 1
         }
@@ -963,7 +962,6 @@ DEF OMNI_WHEELS Robot {
             0 0 0
             1 1000 0
           ]
-      type "generic"
           numberOfRays 2
           aperture 1
         }
@@ -993,13 +991,12 @@ DEF OMNI_WHEELS Robot {
             0 0 0
             1 1000 0
           ]
-      type "generic"
           numberOfRays 2
           aperture 1
         }
         DistanceSensor {
-      translation -0.0707105 0.08 -0.070711
-      rotation 0 1 0 2.35619
+          translation -0.0707105 0.08 -0.070711
+          rotation 0 1 0 2.35619
           children [
             DEF SENSOR Transform {
               rotation 0 0 1 1.57
@@ -1023,12 +1020,10 @@ DEF OMNI_WHEELS Robot {
             0 0 0
             1 1000 0
           ]
-      type "generic"
           numberOfRays 2
           aperture 1
         }
       ]
-  boundingObject USE BODY_TRANS
     }
   ]
   physics Physics {
