@@ -1,49 +1,51 @@
 """omni_controller controller."""
 
 from controller import Robot, LED
+import math
 from enum import Enum, auto
 from threading import Timer
 import random
 
-
-STATE_CHANGE_INTERVAL = 1
-SPEED_FACTOR = 1.0
-
-"""
-CLASSES
-"""
-class Direction(Enum):
-    STATIONARY = auto()
-    NORTH = auto()
-    EAST = auto()
-    SOUTH = auto()
-    WEST = auto()
+# Simple default noop function, nothing special
 
 
-DIRECTION_ORDER = [
-    Direction.STATIONARY,
-    Direction.NORTH,
-    Direction.EAST,
-    Direction.SOUTH,
-    Direction.WEST
-]
+def noop():
+    return None
 
 
-direction_index = 0
-move_direction = DIRECTION_ORDER[direction_index]
+SPEED_FACTOR = 5.0
 
-"""
-INITS
-"""
 
+# The state enum essentially dictates what states the bot can be in
+# Separate functions are responsible for execting logic based on what state is current active
+
+
+class State(Enum):
+    IDLE = auto()
+    DECELERATING = auto()
+    TRAVELING_NORTH = auto()
+    TRAVELING_EAST = auto()
+    TRAVELING_SOUTH = auto()
+    TRAVELING_WEST = auto()
+
+# Every job has its own unique enum to distinguish between them
+
+
+class Job(Enum):
+    DRIVE_SQUARE = auto()
+
+
+# Here we are essentially just initializing the robot, its sensors and actuators
 robot = Robot()
 timestep = int(robot.getBasicTimeStep())
 
 led = robot.getLED("led")
-led.set(int("0xff0000", 16))
+
+accelerometer = robot.getAccelerometer("accelerometer")
+accelerometer.enable(timestep)
 
 
-### Create an iterable list of the motors/wheels
+# Create an iterable list of the motors/wheels
 wheels = [
     robot.getMotor("wheel1"),
     robot.getMotor("wheel2"),
@@ -53,91 +55,128 @@ wheels = [
 for wheel in wheels:
     wheel.setPosition(float('inf'))
     wheel.setVelocity(0.0)
-###
 
-###
 # Create an iterable list of the distance sensors
 ds = []
 dsNames = [
     'ds0', 'ds1', 'ds2', 'ds3',
     'ds4', 'ds5', 'ds6', 'ds7'
-    ]
-    
+]
+
 for i in range(8):
     ds.append(robot.getDistanceSensor(dsNames[i]))
     ds[i].enable(timestep)
-###
 
 
-"""
-FUNCTIONS
-"""
-def freezeWheels():
-    for wheel in wheels:
-        wheel.setVelocity(0)
+def decelerate():
+    wheels[0].setVelocity(0)
+    wheels[1].setVelocity(0)
+    wheels[2].setVelocity(0)
 
 
-def moveNorth():
+def travel_north():
     wheels[0].setVelocity(0)
     wheels[1].setVelocity(-SPEED_FACTOR)
     wheels[2].setVelocity(SPEED_FACTOR)
 
 
-def moveEast():
+def travel_east():
     wheels[0].setVelocity(-2 * SPEED_FACTOR)
     wheels[1].setVelocity(SPEED_FACTOR)
     wheels[2].setVelocity(SPEED_FACTOR)
 
 
-def moveSouth():
+def travel_south():
     wheels[0].setVelocity(0)
     wheels[1].setVelocity(SPEED_FACTOR)
     wheels[2].setVelocity(-SPEED_FACTOR)
 
 
-def moveWest():
+def travel_west():
     wheels[0].setVelocity(2 * SPEED_FACTOR)
     wheels[1].setVelocity(-SPEED_FACTOR)
     wheels[2].setVelocity(-SPEED_FACTOR)
 
 
-direction_map = {
-    Direction.STATIONARY: freezeWheels,
-    Direction.NORTH: moveNorth,
-    Direction.EAST: moveEast,
-    Direction.SOUTH: moveSouth,
-    Direction.WEST: moveWest
-}
-
-
-def move(direction):
-    move_func = direction_map[direction]
-    move_func()
-
-
-def increment_state():
-    global move_direction, direction_index
-    direction_index = (direction_index + 1) % len(DIRECTION_ORDER)
-    move_direction = DIRECTION_ORDER[direction_index]
-    Timer(STATE_CHANGE_INTERVAL, increment_state).start()
-
 def readSensors():
-#reads sensors and returns list of sensor values
+    # reads sensors and returns list of sensor values
     dsValues = []
     for i in range(8):
-       dsValues.append(ds[i].getValue())
-    print(dsValues)
+        dsValues.append(ds[i].getValue())
     return dsValues
 
-"""
-MAIN LOOP
-"""
 
-Timer(STATE_CHANGE_INTERVAL, increment_state).start()
+# Calculate the total acceleration in any non-vertical direction based on the Pythagoras theorem
+def get_total_acceleration():
+    (x, y, z) = accelerometer.getValues()
+    return math.sqrt(abs(x)**2 + abs(z)**2)
 
+
+state = State.IDLE
+
+# Every time this generator function is called, the next direction state is yielded.
+# North will be returned after West has been returned
+
+
+def get_next_direction():
+    while(True):
+        yield State.TRAVELING_NORTH
+        yield State.TRAVELING_EAST
+        yield State.TRAVELING_SOUTH
+        yield State.TRAVELING_WEST
+
+
+# We need to instantiate the generator function, so that the function state can be saved to memory
+next_direction_generator = get_next_direction()
+
+
+# A generator function that will yield the FSM state required to drive in a rectangular shape
+# Also instantiated so that function state can be saved to memory
+def drive_square():
+    time_since = 0
+    while(True):
+        if(time_since < 2000):
+            time_since += timestep
+            yield state
+        else:
+            while(True):
+                time_since = 0
+                yield State.DECELERATING
+                acceleration = get_total_acceleration()
+                print(acceleration)
+                if(-0.05 < acceleration < 0.05):
+                    yield next(next_direction_generator)
+                    break
+
+# We get the newly calculated FSM state based on what the state_generator yields
+# state_generator can be seen as active_job_instance
+
+
+def get_state():
+    new_state = next(state_generator)
+    return new_state
+
+# Execute some function based on the current state of the FSM
+
+
+def execute_state():
+    state_map = {
+        State.IDLE: noop,
+        State.DECELERATING: decelerate,
+        State.TRAVELING_NORTH: travel_north,
+        State.TRAVELING_EAST: travel_east,
+        State.TRAVELING_SOUTH: travel_south,
+        State.TRAVELING_WEST: travel_west
+    }
+    state_func = state_map[state]
+    state_func()
+
+
+state_generator = drive_square()
 
 while robot.step(timestep) != -1:
-    move(move_direction)
-    led.set(random.randint(16, (int("0xffffff",16))))
-    
     readSensors()
+
+    state = get_state()
+    execute_state()
+    led.set(random.randint(16, (int("0xffffff", 16))))

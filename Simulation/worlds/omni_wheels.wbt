@@ -81,6 +81,9 @@ DEF OMNI_WHEELS Robot {
         }
       ]
     }
+    Accelerometer {
+      yAxis FALSE
+    }
     DEF SOLID1 Solid {
       children [
         DEF WHEEL1 HingeJoint {
@@ -1048,7 +1051,7 @@ SolidBox {
   }
 }
 SolidBox {
-  translation 0.62269 0.23773750000000007 0.06744
+  translation 1.24269 0.237738 1.11744
   rotation -0.7005929531808247 0.07054384850712524 0.7100655458414911 3.60049804085859e-18
   name "box(2)"
   size 0.5 0.5 0.5
