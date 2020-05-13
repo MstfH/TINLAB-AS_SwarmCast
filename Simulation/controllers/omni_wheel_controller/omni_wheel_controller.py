@@ -12,6 +12,8 @@ SPEED_FACTOR = 1.0
 """
 CLASSES
 """
+
+
 class Direction(Enum):
     STATIONARY = auto()
     NORTH = auto()
@@ -43,7 +45,7 @@ led = robot.getLED("led")
 led.set(int("0xff0000", 16))
 
 
-### Create an iterable list of the motors/wheels
+# Create an iterable list of the wheel motors
 wheels = [
     robot.getMotor("wheel1"),
     robot.getMotor("wheel2"),
@@ -53,25 +55,28 @@ wheels = [
 for wheel in wheels:
     wheel.setPosition(float('inf'))
     wheel.setVelocity(0.0)
-###
 
-###
 # Create an iterable list of the distance sensors
-ds = []
-dsNames = [
-    'ds0', 'ds1', 'ds2', 'ds3',
-    'ds4', 'ds5', 'ds6', 'ds7'
-    ]
-    
-for i in range(8):
-    ds.append(robot.getDistanceSensor(dsNames[i]))
-    ds[i].enable(timestep)
-###
+ds = [
+    robot.getDistanceSensor("ds0"),
+    robot.getDistanceSensor("ds1"),
+    robot.getDistanceSensor("ds2"),
+    robot.getDistanceSensor("ds3"),
+    robot.getDistanceSensor("ds4"),
+    robot.getDistanceSensor("ds5"),
+    robot.getDistanceSensor("ds6"),
+    robot.getDistanceSensor("ds7"),
+]
+
+for sensor in ds:
+    sensor.enable(timestep)
 
 
 """
 FUNCTIONS
 """
+
+
 def freezeWheels():
     for wheel in wheels:
         wheel.setVelocity(0)
@@ -121,13 +126,11 @@ def increment_state():
     move_direction = DIRECTION_ORDER[direction_index]
     Timer(STATE_CHANGE_INTERVAL, increment_state).start()
 
+
 def readSensors():
-#reads sensors and returns list of sensor values
-    dsValues = []
-    for i in range(8):
-       dsValues.append(ds[i].getValue())
-    print(dsValues)
-    return dsValues
+    # Map distance sensors into their respective values
+    return map(lambda sensor: sensor.getValue(), ds)
+
 
 """
 MAIN LOOP
@@ -138,6 +141,6 @@ Timer(STATE_CHANGE_INTERVAL, increment_state).start()
 
 while robot.step(timestep) != -1:
     move(move_direction)
-    led.set(random.randint(16, (int("0xffffff",16))))
-    
+    led.set(random.randint(16, (int("0xffffff", 16))))
+
     readSensors()
