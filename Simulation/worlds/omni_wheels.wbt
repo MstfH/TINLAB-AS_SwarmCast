@@ -746,7 +746,7 @@ DEF OMNI_WHEELS Robot {
         0 0 0
         1 1000 0
       ]
-      type "sonar"
+      type "generic"
       numberOfRays 2
       aperture 1
     }
@@ -776,7 +776,7 @@ DEF OMNI_WHEELS Robot {
         0 0 0
         1 1000 0
       ]
-      type "sonar"
+      type "generic"
       numberOfRays 2
       aperture 1
     }
@@ -806,7 +806,7 @@ DEF OMNI_WHEELS Robot {
         0 0 0
         1 1000 0
       ]
-      type "sonar"
+      type "generic"
       numberOfRays 2
       aperture 1
     }
@@ -836,7 +836,7 @@ DEF OMNI_WHEELS Robot {
         0 0 0
         1 1000 0
       ]
-      type "sonar"
+      type "generic"
       numberOfRays 2
       aperture 1
     }
@@ -866,7 +866,7 @@ DEF OMNI_WHEELS Robot {
         0 0 0
         1 1000 0
       ]
-      type "sonar"
+      type "generic"
       numberOfRays 2
       aperture 1
     }
@@ -896,7 +896,7 @@ DEF OMNI_WHEELS Robot {
         0 0 0
         1 1000 0
       ]
-      type "sonar"
+      type "generic"
       numberOfRays 2
       aperture 1
     }
@@ -926,7 +926,7 @@ DEF OMNI_WHEELS Robot {
         0 0 0
         1 1000 0
       ]
-      type "sonar"
+      type "generic"
       numberOfRays 2
       aperture 1
     }
@@ -954,9 +954,9 @@ DEF OMNI_WHEELS Robot {
       name "ds7"
       lookupTable [
         0 0 0
-        0 1000 0
+        1 1000 0
       ]
-      type "sonar"
+      type "generic"
       numberOfRays 2
       aperture 1
     }
