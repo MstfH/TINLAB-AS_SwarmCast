@@ -4,4 +4,4 @@ Display swarm
 
 ## Lidar
 
-Change the file ..\Webots\projects\devices\velodyne\protos\VelodynePuck.proto with [VelodynePuck.proto](.\proto\VelodynePuck.proto).
+Change the file ..\Webots\projects\devices\velodyne\protos\VelodynePuck.proto with [VelodynePuck.proto](/proto/VelodynePuck.proto).
