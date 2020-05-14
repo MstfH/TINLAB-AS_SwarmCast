@@ -120,7 +120,7 @@ PROTO VelodynePuck [
     }
     %{ end }%
 	#Number of points
-    horizontalResolution 90
+    horizontalResolution 900
 	#2pi or a full circle
     fieldOfView 6.28318
 	#To get the right number change degree to radians
@@ -128,9 +128,9 @@ PROTO VelodynePuck [
     %{ if fields.version.value == "Puck Hi-Res" then }%
       verticalFieldOfView 0.3491 # 20deg
     %{ else }%
-      verticalFieldOfView 0.1745 # 10deg
+      verticalFieldOfView 0.5236 # 30deg
     %{ end }%
-    numberOfLayers 5
+    numberOfLayers 1
     minRange 0.15
     maxRange 100
     spherical TRUE

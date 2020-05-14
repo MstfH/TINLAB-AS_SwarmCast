@@ -1,2 +1,3 @@
-**/.omni_wheels.wbproj
-**/__pycache__/
+.omni_wheels.wbproj
+__pycache__
+.dist
