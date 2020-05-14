@@ -1,1 +1,3 @@
 .omni_wheels.wbproj
+.dist
+__pycache__

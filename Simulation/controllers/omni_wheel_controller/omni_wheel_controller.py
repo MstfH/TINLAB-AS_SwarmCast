@@ -4,7 +4,7 @@ from controller import Robot, LED, Lidar
 from enum import Enum, auto
 from threading import Timer
 import random
-
+import sensorlogic.lidarlogic as sl
 
 STATE_CHANGE_INTERVAL = 1
 SPEED_FACTOR = 1.0
@@ -132,8 +132,9 @@ def readSensors():
        dsValues.append(ds[i].getValue())
     
     #lidar.getRangeImage() for all layers
-    #lidar.getLayerRangeImage(3) for layer 3 of the n layers 
-    print(lidar.getRangeImage())
+    #lidar.getLayerRangeImage(3) for layer 3 of the n layers
+    #where layer 1 is the lowest and top layer the highest
+    sl.lidarPoint(lidar.getRangeImage())
     print(dsValues)
     return dsValues
 

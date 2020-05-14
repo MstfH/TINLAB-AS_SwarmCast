@@ -7,8 +7,8 @@ WorldInfo {
   basicTimeStep 8
 }
 Viewpoint {
-  orientation -0.986039009280902 0.11935131033788571 0.11611346561431483 1.5573526269623466
-  position 1.2376513964640707 10.023060275330552 -0.3779011105765262
+  orientation -0.440798002500895 0.8071121011704461 0.39276860507867595 1.6695619936231232
+  position 4.278733546205725 3.1134051936234846 -2.0464973595493063
 }
 TexturedBackground {
 }
@@ -20,7 +20,7 @@ RectangleArena {
   floorSize 5 5
 }
 DEF OMNI_WHEELS Robot {
-  translation 2.22 0.07 -2.28
+  translation 2.22 0.07 -2
   children [
     VelodynePuck {
       translation 0 0.14 0
@@ -39,15 +39,15 @@ DEF OMNI_WHEELS Robot {
             }
           ]
           endPoint Solid {
-            translation 2.9839051576309894e-10 6.974574268409021e-06 0.10000000000159216
-            rotation -0.9999888612417421 4.362970420922554e-05 0.004719691609950582 1.3978528260658475e-07
+            translation 2.984293819639199e-10 6.974574268407362e-06 0.10000000000159216
+            rotation -0.9993837962287866 4.3606089668371336e-05 -0.03510022697716095 1.3978528260658475e-07
             children [
               DEF sr1 HingeJoint {
                 jointParameters HingeJointParameters {
                   anchor 0 0.05 0.02
                 }
                 endPoint Solid {
-                  translation -6.300555109682454e-19 0.05000000000000001 0.020000000000000004
+                  translation 0 0.05000000000000003 0.020000000000000018
                   rotation 1 0 0 0
                   children [
                     DEF r1 Transform {
@@ -81,7 +81,7 @@ DEF OMNI_WHEELS Robot {
                   anchor -0.03535 0.03535 0.02
                 }
                 endPoint Solid {
-                  translation -0.03535000000000001 0.03535 0.020000000000000004
+                  translation -0.03534999999999977 0.03534999999999998 0.020000000000000018
                   rotation 0.7071067811865476 0.7071067811865476 0 0
                   children [
                     DEF r2 Transform {
@@ -104,7 +104,7 @@ DEF OMNI_WHEELS Robot {
                   anchor 0 -0.05 0.02
                 }
                 endPoint Solid {
-                  translation -5.912995143307218e-19 -0.05000000000000001 0.020000000000000018
+                  translation 0 -0.05000000000000002 0.020000000000000018
                   rotation 1 0 0 0
                   children [
                     DEF r3 Transform {
@@ -128,7 +128,7 @@ DEF OMNI_WHEELS Robot {
                   anchor 0.03535 -0.03535 0.02
                 }
                 endPoint Solid {
-                  translation 0.03534999999999997 -0.035350000000000006 0.020000000000000004
+                  translation 0.035350000000000215 -0.03534999999999998 0.020000000000000018
                   rotation 0.7071067811865476 0.7071067811865476 0 0
                   children [
                     DEF r4 Transform {
@@ -152,7 +152,7 @@ DEF OMNI_WHEELS Robot {
                   anchor -0.05 0 0.02
                 }
                 endPoint Solid {
-                  translation -0.050000000000000024 0 0.020000000000000004
+                  translation -0.050000000000000266 -2.7755575615628914e-17 0.020000000000000018
                   children [
                     DEF r5 Transform {
                       children [
@@ -174,7 +174,7 @@ DEF OMNI_WHEELS Robot {
                   anchor 0.05 0 0.02
                 }
                 endPoint Solid {
-                  translation 0.04999999999999998 0 0.02000000000000003
+                  translation 0.04999999999999982 0 0.020000000000000018
                   children [
                     DEF r6 Transform {
                       children [
@@ -196,7 +196,7 @@ DEF OMNI_WHEELS Robot {
                   anchor -0.03535 -0.03535 0.02
                 }
                 endPoint Solid {
-                  translation -0.03535000000000003 -0.03534999999999999 0.020000000000000004
+                  translation -0.03534999999999977 -0.03534999999999998 0.020000000000000018
                   rotation -0.7071067811865476 0.7071067811865476 0 0
                   children [
                     DEF r7 Transform {
@@ -220,7 +220,7 @@ DEF OMNI_WHEELS Robot {
                   anchor 0.03535 0.03535 0.02
                 }
                 endPoint Solid {
-                  translation 0.035349999999999986 0.03535 0.020000000000000004
+                  translation 0.035350000000000215 0.03534999999999999 0.020000000000000018
                   rotation -0.7071067811865476 0.7071067811865476 0 0
                   children [
                     DEF r8 Transform {
@@ -302,15 +302,15 @@ DEF OMNI_WHEELS Robot {
             }
           ]
           endPoint Solid {
-            translation -2.5517629163253003e-11 6.886120670963891e-06 0.10000000021802882
-            rotation -5.7252811673794095e-05 6.761295419097584e-08 0.9999999983610555 0.002405810004020338
+            translation -2.551758804258952e-11 6.88612067097083e-06 0.1000000002180288
+            rotation -5.725281167346877e-05 6.761295419053326e-08 0.9999999983610555 0.002405810004020338
             children [
               DEF sr1 HingeJoint {
                 jointParameters HingeJointParameters {
                   anchor 0 0.05 0.02
                 }
                 endPoint Solid {
-                  translation -6.938893903907228e-18 0.05000000000000003 0.02000000000000003
+                  translation 0 0.05000000000000003 0.020000000000000018
                   rotation 1 0 0 0
                   children [
                     USE r1
@@ -329,7 +329,7 @@ DEF OMNI_WHEELS Robot {
                   anchor -0.03535 0.03535 0.02
                 }
                 endPoint Solid {
-                  translation -0.03535 0.03535000000000002 0.02000000000000003
+                  translation -0.03534999999999977 0.035350000000000006 0.020000000000000018
                   rotation 0.7071067811865476 0.7071067811865476 0 0
                   children [
                     USE r2
@@ -347,7 +347,7 @@ DEF OMNI_WHEELS Robot {
                   anchor 0 -0.05 0.02
                 }
                 endPoint Solid {
-                  translation -1.3877787807814457e-17 -0.05000000000000001 0.020000000000000004
+                  translation 6.661338147750943e-16 -0.05000000000000001 0.020000000000000018
                   rotation 1 0 0 0
                   children [
                     USE r3
@@ -366,7 +366,7 @@ DEF OMNI_WHEELS Robot {
                   anchor 0.03535 -0.03535 0.02
                 }
                 endPoint Solid {
-                  translation 0.035349999999999986 -0.03535 0.02000000000000006
+                  translation 0.035350000000000215 -0.03535000000000001 0.020000000000000018
                   rotation 0.7071067811865476 0.7071067811865476 0 0
                   children [
                     USE r4
@@ -385,7 +385,7 @@ DEF OMNI_WHEELS Robot {
                   anchor -0.05 0 0.02
                 }
                 endPoint Solid {
-                  translation -0.049999999999999996 -6.938893903907228e-18 0.020000000000000004
+                  translation -0.04999999999999982 0 0.020000000000000018
                   children [
                     USE r5
                   ]
@@ -403,7 +403,7 @@ DEF OMNI_WHEELS Robot {
                   anchor 0.05 0 0.02
                 }
                 endPoint Solid {
-                  translation 0.05 -2.7755575615628914e-17 0.020000000000000046
+                  translation 0.050000000000000044 -6.938893903907223e-17 0.020000000000000018
                   children [
                     USE r6
                   ]
@@ -421,7 +421,7 @@ DEF OMNI_WHEELS Robot {
                   anchor -0.03535 -0.03535 0.02
                 }
                 endPoint Solid {
-                  translation -0.035350000000000006 -0.035350000000000006 0.020000000000000018
+                  translation -0.035350000000000215 -0.03535000000000003 0.020000000000000018
                   rotation -0.7071067811865476 0.7071067811865476 0 0
                   children [
                     USE r7
@@ -440,7 +440,7 @@ DEF OMNI_WHEELS Robot {
                   anchor 0.03535 0.03535 0.02
                 }
                 endPoint Solid {
-                  translation 0.035349999999999965 0.035350000000000006 0.02000000000000006
+                  translation 0.03534999999999999 0.03534999999999999 0.020000000000000018
                   rotation -0.7071067811865476 0.7071067811865476 0 0
                   children [
                     USE r8
@@ -498,15 +498,15 @@ DEF OMNI_WHEELS Robot {
             }
           ]
           endPoint Solid {
-            translation -2.2253379094084736e-10 6.980787126402432e-06 0.09999999996041298
-            rotation -3.571098386263656e-05 6.775461902917176e-08 0.9999999993623606 0.003909440002633497
+            translation -2.2253399123428605e-10 6.980787126409371e-06 0.09999999996041242
+            rotation -3.5710983862914616e-05 6.775461903365931e-08 0.9999999993623606 0.003909440002406309
             children [
               DEF sr1 HingeJoint {
                 jointParameters HingeJointParameters {
                   anchor 0 0.05 0.02
                 }
                 endPoint Solid {
-                  translation 2.7755575615628914e-17 0.04999999999999999 0.019999999999999962
+                  translation 4.440892098500625e-16 0.04999999999999999 0.02000000000000024
                   rotation 1 0 0 0
                   children [
                     USE r1
@@ -525,7 +525,7 @@ DEF OMNI_WHEELS Robot {
                   anchor -0.03535 0.03535 0.02
                 }
                 endPoint Solid {
-                  translation -0.03534999999999996 0.03534999999999998 0.01999999999999995
+                  translation -0.03534999999999977 0.035350000000000006 0.02000000000000024
                   rotation 0.7071067811865476 0.7071067811865476 0 0
                   children [
                     USE r2
@@ -543,7 +543,7 @@ DEF OMNI_WHEELS Robot {
                   anchor 0 -0.05 0.02
                 }
                 endPoint Solid {
-                  translation 1.3877787807814457e-17 -0.04999999999999998 0.019999999999999962
+                  translation 4.440892098500628e-16 -0.049999999999999954 0.020000000000000684
                   rotation 1 0 0 0
                   children [
                     USE r3
@@ -562,7 +562,7 @@ DEF OMNI_WHEELS Robot {
                   anchor 0.03535 -0.03535 0.02
                 }
                 endPoint Solid {
-                  translation 0.035350000000000034 -0.03534999999999998 0.019999999999999976
+                  translation 0.03534999999999977 -0.03534999999999996 0.020000000000000684
                   rotation 0.7071067811865476 0.7071067811865476 0 0
                   children [
                     USE r4
@@ -581,7 +581,7 @@ DEF OMNI_WHEELS Robot {
                   anchor -0.05 0 0.02
                 }
                 endPoint Solid {
-                  translation -0.04999999999999997 6.938893903907228e-18 0.019999999999999962
+                  translation -0.050000000000000266 0 0.020000000000000462
                   children [
                     USE r5
                   ]
@@ -599,7 +599,7 @@ DEF OMNI_WHEELS Robot {
                   anchor 0.05 0 0.02
                 }
                 endPoint Solid {
-                  translation 0.050000000000000044 1.3877787807814457e-17 0.019999999999999934
+                  translation 0.050000000000000266 2.77555756156289e-17 0.020000000000000906
                   children [
                     USE r6
                   ]
@@ -617,7 +617,7 @@ DEF OMNI_WHEELS Robot {
                   anchor -0.03535 -0.03535 0.02
                 }
                 endPoint Solid {
-                  translation -0.035349999999999986 -0.03534999999999998 0.01999999999999999
+                  translation -0.03534999999999977 -0.035349999999999965 0.02000000000000024
                   rotation -0.7071067811865476 0.7071067811865476 0 0
                   children [
                     USE r7
@@ -636,7 +636,7 @@ DEF OMNI_WHEELS Robot {
                   anchor 0.03535 0.03535 0.02
                 }
                 endPoint Solid {
-                  translation 0.03535000000000001 0.035350000000000006 0.01999999999999999
+                  translation 0.035350000000000215 0.035350000000000006 0.020000000000000684
                   rotation -0.7071067811865476 0.7071067811865476 0 0
                   children [
                     USE r8
@@ -714,7 +714,7 @@ DEF OMNI_WHEELS Robot {
             }
             PointLight {
               attenuation 0 0 1
-              color 0.4588235318660736 0.9686274528503418 0.529411792755127
+              color 0.4901960790157318 0.23137255012989044 0.16078431904315948
               intensity 0.5
               location 0 0.03 0
               on FALSE
@@ -973,14 +973,14 @@ DEF OMNI_WHEELS Robot {
   controller "omni_wheel_controller"
 }
 SolidBox {
-  translation -1.09731 0.2377375001039332 -1.15256
+  translation -1.09731 0.237738 -2.18256
   rotation -0.3520310156358334 0.318649790868044 -0.8800775390896846 2.232199401272946e-18
   size 0.5 0.5 0.5
   physics Physics {
   }
 }
 SolidBox {
-  translation -0.38731 0.237738 -1.86256
+  translation -0.38731 0.237738 -2.19256
   rotation -0.3520310156358334 0.318649790868044 -0.8800775390896846 2.232199401272946e-18
   name "box(1)"
   size 0.5 0.5 0.5
@@ -988,7 +988,7 @@ SolidBox {
   }
 }
 SolidBox {
-  translation 1.38269 0.237738 -2.21256
+  translation 1.38269 0.237738 -2.01256
   rotation -0.7005929531808247 0.07054384850712524 0.7100655458414911 3.60049804085859e-18
   name "box(2)"
   size 0.5 0.5 0.5
@@ -996,7 +996,7 @@ SolidBox {
   }
 }
 SolidBox {
-  translation -2.21731 0.237738 2.16744
+  translation -2.21731 0.237738 -2.16256
   rotation -0.3520310156358334 0.318649790868044 -0.8800775390896846 2.232199401272946e-18
   name "box(3)"
   size 0.5 0.5 0.5
