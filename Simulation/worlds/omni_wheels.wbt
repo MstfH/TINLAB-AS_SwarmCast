@@ -7,24 +7,86 @@ WorldInfo {
   basicTimeStep 8
 }
 Viewpoint {
-  orientation -0.440798002500895 0.8071121011704461 0.39276860507867595 1.6695619936231232
-  position 4.278733546205725 3.1134051936234846 -2.0464973595493063
+  orientation 0.31171677535583414 0.9018207441213779 0.2992523975411472 4.6498978307177055
+  position -2.8317083024669065 2.0912279472120243 0.016458406524991753
 }
 TexturedBackground {
 }
 TexturedBackgroundLight {
 }
 RectangleArena {
-  translation 4.69286e-08 -0.01 0
-  rotation 0 0 1 4.692820414042842e-06
   floorSize 5 5
 }
 DEF OMNI_WHEELS Robot {
-  translation 2.22 0.07 -2
+  translation 0 0.06 0
   children [
     VelodynePuck {
       translation 0 0.14 0
       version "Puck LITE"
+    }
+    DEF SKIRT Transform {
+      children [
+        DEF SUPPORT Solid {
+          translation 0 -0.03 -0.12
+          children [
+            Shape {
+              appearance PBRAppearance {
+                baseColor 0 0.666667 0
+              }
+              geometry Box {
+                size 0.01 0.01 0.05
+              }
+            }
+          ]
+        }
+        DEF SUPPORT Solid {
+          translation -0.0848521 -0.03 0.0848532
+          rotation 0 -1 0 0.785395307179586
+          children [
+            Shape {
+              appearance PBRAppearance {
+                baseColor 0 0.666667 0
+              }
+              geometry Box {
+                size 0.01 0.01 0.05
+              }
+            }
+          ]
+          name "solid(1)"
+        }
+        DEF SUPPORT Solid {
+          translation 0.103923 -0.03 0.0599999
+          rotation 0 1 0 1.0472
+          children [
+            Shape {
+              appearance PBRAppearance {
+                baseColor 0 0.666667 0
+              }
+              geometry Box {
+                size 0.01 0.01 0.05
+              }
+            }
+          ]
+          name "solid(2)"
+        }
+        SolidPipe {
+          translation 0 -0.02 0
+          name "skirt"
+          height 0.05
+          radius 0.15
+          thickness 0.005
+          appearance PBRAppearance {
+            baseColor 0 0.666667 0
+            roughness 0.5
+            metalness 0
+          }
+          physics Physics {
+          }
+        }
+      ]
+    }
+    Accelerometer {
+      yAxis FALSE
     }
     DEF SOLID1 Solid {
       children [
@@ -39,15 +101,15 @@ DEF OMNI_WHEELS Robot {
             }
           ]
           endPoint Solid {
-            translation 2.984293819639199e-10 6.974574268407362e-06 0.10000000000159216
-            rotation -0.9993837962287866 4.3606089668371336e-05 -0.03510022697716095 1.3978528260658475e-07
+            translation 0 0 0.1
+            rotation 0 0 1 0
             children [
               DEF sr1 HingeJoint {
                 jointParameters HingeJointParameters {
                   anchor 0 0.05 0.02
                 }
                 endPoint Solid {
-                  translation 0 0.05000000000000003 0.020000000000000018
+                  translation 0 0.05 0.02
                   rotation 1 0 0 0
                   children [
                     DEF r1 Transform {
@@ -81,7 +143,7 @@ DEF OMNI_WHEELS Robot {
                   anchor -0.03535 0.03535 0.02
                 }
                 endPoint Solid {
-                  translation -0.03534999999999977 0.03534999999999998 0.020000000000000018
+                  translation -0.03535 0.03535 0.02
                   rotation 0.7071067811865476 0.7071067811865476 0 0
                   children [
                     DEF r2 Transform {
@@ -104,7 +166,7 @@ DEF OMNI_WHEELS Robot {
                   anchor 0 -0.05 0.02
                 }
                 endPoint Solid {
-                  translation 0 -0.05000000000000002 0.020000000000000018
+                  translation 0 -0.05 0.02
                   rotation 1 0 0 0
                   children [
                     DEF r3 Transform {
@@ -128,7 +190,7 @@ DEF OMNI_WHEELS Robot {
                   anchor 0.03535 -0.03535 0.02
                 }
                 endPoint Solid {
-                  translation 0.035350000000000215 -0.03534999999999998 0.020000000000000018
+                  translation 0.03535 -0.03535 0.02
                   rotation 0.7071067811865476 0.7071067811865476 0 0
                   children [
                     DEF r4 Transform {
@@ -152,7 +214,7 @@ DEF OMNI_WHEELS Robot {
                   anchor -0.05 0 0.02
                 }
                 endPoint Solid {
-                  translation -0.050000000000000266 -2.7755575615628914e-17 0.020000000000000018
+                  translation -0.05 0 0.02
                   children [
                     DEF r5 Transform {
                       children [
@@ -174,7 +236,7 @@ DEF OMNI_WHEELS Robot {
                   anchor 0.05 0 0.02
                 }
                 endPoint Solid {
-                  translation 0.04999999999999982 0 0.020000000000000018
+                  translation 0.05 0 0.02
                   children [
                     DEF r6 Transform {
                       children [
@@ -196,7 +258,7 @@ DEF OMNI_WHEELS Robot {
                   anchor -0.03535 -0.03535 0.02
                 }
                 endPoint Solid {
-                  translation -0.03534999999999977 -0.03534999999999998 0.020000000000000018
+                  translation -0.03535 -0.03535 0.02
                   rotation -0.7071067811865476 0.7071067811865476 0 0
                   children [
                     DEF r7 Transform {
@@ -220,7 +282,7 @@ DEF OMNI_WHEELS Robot {
                   anchor 0.03535 0.03535 0.02
                 }
                 endPoint Solid {
-                  translation 0.035350000000000215 0.03534999999999999 0.020000000000000018
+                  translation 0.03535 0.03535 0.02
                   rotation -0.7071067811865476 0.7071067811865476 0 0
                   children [
                     DEF r8 Transform {
@@ -302,15 +364,15 @@ DEF OMNI_WHEELS Robot {
             }
           ]
           endPoint Solid {
-            translation -2.551758804258952e-11 6.88612067097083e-06 0.1000000002180288
-            rotation -5.725281167346877e-05 6.761295419053326e-08 0.9999999983610555 0.002405810004020338
+            translation 0 0 0.1
+            rotation 0 0 1 0.00240580999995935
             children [
               DEF sr1 HingeJoint {
                 jointParameters HingeJointParameters {
                   anchor 0 0.05 0.02
                 }
                 endPoint Solid {
-                  translation 0 0.05000000000000003 0.020000000000000018
+                  translation 0 0.05 0.02
                   rotation 1 0 0 0
                   children [
                     USE r1
@@ -329,7 +391,7 @@ DEF OMNI_WHEELS Robot {
                   anchor -0.03535 0.03535 0.02
                 }
                 endPoint Solid {
-                  translation -0.03534999999999977 0.035350000000000006 0.020000000000000018
+                  translation -0.03535 0.03535 0.02
                   rotation 0.7071067811865476 0.7071067811865476 0 0
                   children [
                     USE r2
@@ -347,7 +409,7 @@ DEF OMNI_WHEELS Robot {
                   anchor 0 -0.05 0.02
                 }
                 endPoint Solid {
-                  translation 6.661338147750943e-16 -0.05000000000000001 0.020000000000000018
+                  translation 0 -0.05 0.02
                   rotation 1 0 0 0
                   children [
                     USE r3
@@ -366,7 +428,7 @@ DEF OMNI_WHEELS Robot {
                   anchor 0.03535 -0.03535 0.02
                 }
                 endPoint Solid {
-                  translation 0.035350000000000215 -0.03535000000000001 0.020000000000000018
+                  translation 0.03535 -0.03535 0.02
                   rotation 0.7071067811865476 0.7071067811865476 0 0
                   children [
                     USE r4
@@ -385,7 +447,7 @@ DEF OMNI_WHEELS Robot {
                   anchor -0.05 0 0.02
                 }
                 endPoint Solid {
-                  translation -0.04999999999999982 0 0.020000000000000018
+                  translation -0.05 0 0.02
                   children [
                     USE r5
                   ]
@@ -403,7 +465,7 @@ DEF OMNI_WHEELS Robot {
                   anchor 0.05 0 0.02
                 }
                 endPoint Solid {
-                  translation 0.050000000000000044 -6.938893903907223e-17 0.020000000000000018
+                  translation 0.05 0 0.02
                   children [
                     USE r6
                   ]
@@ -421,7 +483,7 @@ DEF OMNI_WHEELS Robot {
                   anchor -0.03535 -0.03535 0.02
                 }
                 endPoint Solid {
-                  translation -0.035350000000000215 -0.03535000000000003 0.020000000000000018
+                  translation -0.03535 -0.03535 0.02
                   rotation -0.7071067811865476 0.7071067811865476 0 0
                   children [
                     USE r7
@@ -440,7 +502,7 @@ DEF OMNI_WHEELS Robot {
                   anchor 0.03535 0.03535 0.02
                 }
                 endPoint Solid {
-                  translation 0.03534999999999999 0.03534999999999999 0.020000000000000018
+                  translation 0.03535 0.03535 0.02
                   rotation -0.7071067811865476 0.7071067811865476 0 0
                   children [
                     USE r8
@@ -498,15 +560,15 @@ DEF OMNI_WHEELS Robot {
             }
           ]
           endPoint Solid {
-            translation -2.2253399123428605e-10 6.980787126409371e-06 0.09999999996041242
-            rotation -3.5710983862914616e-05 6.775461903365931e-08 0.9999999993623606 0.003909440002406309
+            translation 0 0 0.1
+            rotation 0 0 1 0.0039094400000208316
             children [
               DEF sr1 HingeJoint {
                 jointParameters HingeJointParameters {
                   anchor 0 0.05 0.02
                 }
                 endPoint Solid {
-                  translation 4.440892098500625e-16 0.04999999999999999 0.02000000000000024
+                  translation 0 0.05 0.02
                   rotation 1 0 0 0
                   children [
                     USE r1
@@ -525,7 +587,7 @@ DEF OMNI_WHEELS Robot {
                   anchor -0.03535 0.03535 0.02
                 }
                 endPoint Solid {
-                  translation -0.03534999999999977 0.035350000000000006 0.02000000000000024
+                  translation -0.03535 0.03535 0.02
                   rotation 0.7071067811865476 0.7071067811865476 0 0
                   children [
                     USE r2
@@ -543,7 +605,7 @@ DEF OMNI_WHEELS Robot {
                   anchor 0 -0.05 0.02
                 }
                 endPoint Solid {
-                  translation 4.440892098500628e-16 -0.049999999999999954 0.020000000000000684
+                  translation 0 -0.05 0.02
                   rotation 1 0 0 0
                   children [
                     USE r3
@@ -562,7 +624,7 @@ DEF OMNI_WHEELS Robot {
                   anchor 0.03535 -0.03535 0.02
                 }
                 endPoint Solid {
-                  translation 0.03534999999999977 -0.03534999999999996 0.020000000000000684
+                  translation 0.03535 -0.03535 0.02
                   rotation 0.7071067811865476 0.7071067811865476 0 0
                   children [
                     USE r4
@@ -581,7 +643,7 @@ DEF OMNI_WHEELS Robot {
                   anchor -0.05 0 0.02
                 }
                 endPoint Solid {
-                  translation -0.050000000000000266 0 0.020000000000000462
+                  translation -0.05 0 0.02
                   children [
                     USE r5
                   ]
@@ -599,7 +661,7 @@ DEF OMNI_WHEELS Robot {
                   anchor 0.05 0 0.02
                 }
                 endPoint Solid {
-                  translation 0.050000000000000266 2.77555756156289e-17 0.020000000000000906
+                  translation 0.05 0 0.02
                   children [
                     USE r6
                   ]
@@ -617,7 +679,7 @@ DEF OMNI_WHEELS Robot {
                   anchor -0.03535 -0.03535 0.02
                 }
                 endPoint Solid {
-                  translation -0.03534999999999977 -0.035349999999999965 0.02000000000000024
+                  translation -0.03535 -0.03535 0.02
                   rotation -0.7071067811865476 0.7071067811865476 0 0
                   children [
                     USE r7
@@ -636,7 +698,7 @@ DEF OMNI_WHEELS Robot {
                   anchor 0.03535 0.03535 0.02
                 }
                 endPoint Solid {
-                  translation 0.035350000000000215 0.035350000000000006 0.020000000000000684
+                  translation 0.03535 0.03535 0.02
                   rotation -0.7071067811865476 0.7071067811865476 0 0
                   children [
                     USE r8
@@ -714,7 +776,7 @@ DEF OMNI_WHEELS Robot {
             }
             PointLight {
               attenuation 0 0 1
-              color 0.4901960790157318 0.23137255012989044 0.16078431904315948
+              color 0.43921568989753723 0.7529411911964417 0.5137255191802979
               intensity 0.5
               location 0 0.03 0
               on FALSE
@@ -726,261 +788,257 @@ DEF OMNI_WHEELS Robot {
       color []
       gradual TRUE
     }
-    DistanceSensor {
-      translation 0 0.08 -0.1
-      rotation 0 1 0 1.5708
+    DEF DISTANCE_SENSORS Transform {
+      translation 0 -0.1 0
       children [
-        DEF SENSOR Transform {
-          rotation 0 0 1 1.57
+        DistanceSensor {
+          translation 0 0.08 -0.15
+          rotation 0 1 0 1.5708
           children [
-            Shape {
-              appearance PBRAppearance {
-                baseColor 0.975691 0.981481 0.0252992
-                roughness 1
-                metalness 0
-              }
-              geometry Cylinder {
-                height 0.004
-                radius 0.008
-              }
+            DEF SENSOR Transform {
+              rotation 0 0 1 1.57
+              children [
+                Shape {
+                  appearance PBRAppearance {
+                    baseColor 0.975691 0.981481 0.0252992
+                    roughness 1
+                    metalness 0
+                  }
+                  geometry Cylinder {
+                    height 0.004
+                    radius 0.008
+                  }
+                }
+              ]
             }
           ]
+          name "ds0"
+          lookupTable [
+            0 0 0
+            1 1000 0
+          ]
+          numberOfRays 2
+          aperture 1
         }
-      ]
-      name "ds0"
-      lookupTable [
-        0 0 0
-        1 1000 0
-      ]
-      type "sonar"
-      numberOfRays 27
-      aperture 1
-    }
-    DistanceSensor {
-      translation 0.0707108 0.08 -0.07071
-      rotation 0 1 0 0.78539
-      children [
-        DEF SENSOR Transform {
-          rotation 0 0 1 1.57
+        DistanceSensor {
+          translation 0.106 0.08 -0.106
+          rotation 0 1 0 0.78539
           children [
-            Shape {
-              appearance PBRAppearance {
-                baseColor 0.975691 0.981481 0.0252992
-                roughness 1
-                metalness 0
-              }
-              geometry Cylinder {
-                height 0.004
-                radius 0.008
-              }
+            DEF SENSOR Transform {
+              rotation 0 0 1 1.57
+              children [
+                Shape {
+                  appearance PBRAppearance {
+                    baseColor 0.975691 0.981481 0.0252992
+                    roughness 1
+                    metalness 0
+                  }
+                  geometry Cylinder {
+                    height 0.004
+                    radius 0.008
+                  }
+                }
+              ]
             }
           ]
+          name "ds1"
+          lookupTable [
+            0 0 0
+            1 1000 0
+          ]
+          numberOfRays 2
+          aperture 1
         }
-      ]
-      name "ds1"
-      lookupTable [
-        0 0 0
-        1 1000 0
-      ]
-      type "sonar"
-      numberOfRays 27
-      aperture 1
-    }
-    DistanceSensor {
-      translation 0.1 0.08 -1.06144e-07
-      rotation 0 1 0 5.307156870259904e-06
-      children [
-        DEF SENSOR Transform {
-          rotation 0 0 1 1.57
+        DistanceSensor {
+          translation 0.15 0.08 0
+          rotation 0 1 0 5.307156870259904e-06
           children [
-            Shape {
-              appearance PBRAppearance {
-                baseColor 0.975691 0.981481 0.0252992
-                roughness 1
-                metalness 0
-              }
-              geometry Cylinder {
-                height 0.004
-                radius 0.008
-              }
+            DEF SENSOR Transform {
+              rotation 0 0 1 1.57
+              children [
+                Shape {
+                  appearance PBRAppearance {
+                    baseColor 0.975691 0.981481 0.0252992
+                    roughness 1
+                    metalness 0
+                  }
+                  geometry Cylinder {
+                    height 0.004
+                    radius 0.008
+                  }
+                }
+              ]
             }
           ]
+          name "ds2"
+          lookupTable [
+            0 0 0
+            1 1000 0
+          ]
+          numberOfRays 2
+          aperture 1
         }
-      ]
-      name "ds2"
-      lookupTable [
-        0 0 0
-        1 1000 0
-      ]
-      type "sonar"
-      numberOfRays 27
-      aperture 1
-    }
-    DistanceSensor {
-      translation 0.070711 0.08 0.0707101
-      rotation 0 1 0 -0.785395307179586
-      children [
-        DEF SENSOR Transform {
-          rotation 0 0 1 1.57
+        DistanceSensor {
+          translation 0.106 0.08 0.106
+          rotation 0 1 0 -0.785395307179586
           children [
-            Shape {
-              appearance PBRAppearance {
-                baseColor 0.975691 0.981481 0.0252992
-                roughness 1
-                metalness 0
-              }
-              geometry Cylinder {
-                height 0.004
-                radius 0.008
-              }
+            DEF SENSOR Transform {
+              rotation 0 0 1 1.57
+              children [
+                Shape {
+                  appearance PBRAppearance {
+                    baseColor 0.975691 0.981481 0.0252992
+                    roughness 1
+                    metalness 0
+                  }
+                  geometry Cylinder {
+                    height 0.004
+                    radius 0.008
+                  }
+                }
+              ]
             }
           ]
+          name "ds3"
+          lookupTable [
+            0 0 0
+            1 1000 0
+          ]
+          numberOfRays 2
+          aperture 1
         }
-      ]
-      name "ds3"
-      lookupTable [
-        0 0 0
-        1 1000 0
-      ]
-      type "sonar"
-      numberOfRays 27
-      aperture 1
-    }
-    DistanceSensor {
-      translation 6.3268e-07 0.08 0.1
-      rotation 0 1 0 -1.57079
-      children [
-        DEF SENSOR Transform {
-          rotation 0 0 1 1.57
+        DistanceSensor {
+          translation 0 0.08 0.15
+          rotation 0 1 0 -1.57079
           children [
-            Shape {
-              appearance PBRAppearance {
-                baseColor 0.975691 0.981481 0.0252992
-                roughness 1
-                metalness 0
-              }
-              geometry Cylinder {
-                height 0.004
-                radius 0.008
-              }
+            DEF SENSOR Transform {
+              rotation 0 0 1 1.57
+              children [
+                Shape {
+                  appearance PBRAppearance {
+                    baseColor 0.975691 0.981481 0.0252992
+                    roughness 1
+                    metalness 0
+                  }
+                  geometry Cylinder {
+                    height 0.004
+                    radius 0.008
+                  }
+                }
+              ]
             }
           ]
+          name "ds4"
+          lookupTable [
+            0 0 0
+            1 1000 0
+          ]
+          numberOfRays 2
+          aperture 1
         }
-      ]
-      name "ds4"
-      lookupTable [
-        0 0 0
-        1 1000 0
-      ]
-      type "sonar"
-      numberOfRays 27
-      aperture 1
-    }
-    DistanceSensor {
-      translation -0.07071 0.08 0.0707113
-      rotation 0 1 0 -2.356185307179586
-      children [
-        DEF SENSOR Transform {
-          rotation 0 0 1 1.57
+        DistanceSensor {
+          translation -0.106 0.08 0.106
+          rotation 0 1 0 -2.356185307179586
           children [
-            Shape {
-              appearance PBRAppearance {
-                baseColor 0.975691 0.981481 0.0252992
-                roughness 1
-                metalness 0
-              }
-              geometry Cylinder {
-                height 0.004
-                radius 0.008
-              }
+            DEF SENSOR Transform {
+              rotation 0 0 1 1.57
+              children [
+                Shape {
+                  appearance PBRAppearance {
+                    baseColor 0.975691 0.981481 0.0252992
+                    roughness 1
+                    metalness 0
+                  }
+                  geometry Cylinder {
+                    height 0.004
+                    radius 0.008
+                  }
+                }
+              ]
             }
           ]
+          name "ds5"
+          lookupTable [
+            0 0 0
+            1 1000 0
+          ]
+          numberOfRays 2
+          aperture 1
         }
-      ]
-      name "ds5"
-      lookupTable [
-        0 0 0
-        1 1000 0
-      ]
-      type "sonar"
-      numberOfRays 27
-      aperture 1
-    }
-    DistanceSensor {
-      translation -0.1 0.08 -2.65359e-07
-      rotation 0 1 0 3.14159
-      children [
-        DEF SENSOR Transform {
-          rotation 0 0 1 1.57
+        DistanceSensor {
+          translation -0.15 0.08 -3.98039e-07
+          rotation 0 1 0 3.14159
           children [
-            Shape {
-              appearance PBRAppearance {
-                baseColor 0.975691 0.981481 0.0252992
-                roughness 1
-                metalness 0
-              }
-              geometry Cylinder {
-                height 0.004
-                radius 0.008
-              }
+            DEF SENSOR Transform {
+              rotation 0 0 1 1.57
+              children [
+                Shape {
+                  appearance PBRAppearance {
+                    baseColor 0.975691 0.981481 0.0252992
+                    roughness 1
+                    metalness 0
+                  }
+                  geometry Cylinder {
+                    height 0.004
+                    radius 0.008
+                  }
+                }
+              ]
             }
           ]
+          name "ds6"
+          lookupTable [
+            0 0 0
+            1 1000 0
+          ]
+          numberOfRays 2
+          aperture 1
         }
-      ]
-      name "ds6"
-      lookupTable [
-        0 0 0
-        1 1000 0
-      ]
-      type "sonar"
-      numberOfRays 27
-      aperture 1
-    }
-    DistanceSensor {
-      translation -0.0707105 0.08 -0.070711
-      rotation 0 1 0 2.35619
-      children [
-        DEF SENSOR Transform {
-          rotation 0 0 1 1.57
+        DistanceSensor {
+          translation -0.0707105 0.08 -0.070711
+          rotation 0 1 0 2.35619
           children [
-            Shape {
-              appearance PBRAppearance {
-                baseColor 0.975691 0.981481 0.0252992
-                roughness 1
-                metalness 0
-              }
-              geometry Cylinder {
-                height 0.004
-                radius 0.008
-              }
+            DEF SENSOR Transform {
+              rotation 0 0 1 1.57
+              children [
+                Shape {
+                  appearance PBRAppearance {
+                    baseColor 0.975691 0.981481 0.0252992
+                    roughness 1
+                    metalness 0
+                  }
+                  geometry Cylinder {
+                    height 0.004
+                    radius 0.008
+                  }
+                }
+              ]
             }
           ]
+          name "ds7"
+          lookupTable [
+            0 0 0
+            1 1000 0
+          ]
+          numberOfRays 2
+          aperture 1
         }
       ]
-      name "ds7"
-      lookupTable [
-        0 0 0
-        1 1000 0
-      ]
-      type "sonar"
-      numberOfRays 27
-      aperture 1
     }
   ]
-  boundingObject USE BODY_TRANS
   physics Physics {
   }
   controller "omni_wheel_controller"
 }
 SolidBox {
-  translation -1.09731 0.237738 -2.18256
+  translation -1.09731 0.2377375001039332 -1.15256
   rotation -0.3520310156358334 0.318649790868044 -0.8800775390896846 2.232199401272946e-18
   size 0.5 0.5 0.5
   physics Physics {
   }
 }
 SolidBox {
-  translation -0.38731 0.237738 -2.19256
+  translation 1.21269 0.2377375001039332 -1.15256
   rotation -0.3520310156358334 0.318649790868044 -0.8800775390896846 2.232199401272946e-18
   name "box(1)"
   size 0.5 0.5 0.5
@@ -988,7 +1046,7 @@ SolidBox {
   }
 }
 SolidBox {
-  translation 1.38269 0.237738 -2.01256
+  translation 1.24269 0.237738 1.11744
   rotation -0.7005929531808247 0.07054384850712524 0.7100655458414911 3.60049804085859e-18
   name "box(2)"
   size 0.5 0.5 0.5
@@ -996,7 +1054,7 @@ SolidBox {
   }
 }
 SolidBox {
-  translation -2.21731 0.237738 -2.16256
+  translation -1.02731 0.2377375001039332 1.14744
   rotation -0.3520310156358334 0.318649790868044 -0.8800775390896846 2.232199401272946e-18
   name "box(3)"
   size 0.5 0.5 0.5
