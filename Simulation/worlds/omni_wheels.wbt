@@ -16,7 +16,7 @@ TexturedBackgroundLight {
   castShadows FALSE
 }
 RectangleArena {
-  translation 0.05 0 -0.05
+  translation -0.1 0 0.1
   floorSize 10 10
   floorTileSize 0.6 0.6
 }
