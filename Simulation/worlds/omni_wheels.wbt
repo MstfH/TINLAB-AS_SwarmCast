@@ -8,14 +8,17 @@ WorldInfo {
 }
 Viewpoint {
   orientation 1 0 0 4.71238898038469
-  position 0 18.04963218266823 -2.886579864025407e-15
+  position 0.05006176886881136 6.396887463350325 -0.04999985227026408
 }
 TexturedBackground {
 }
 TexturedBackgroundLight {
+  castShadows FALSE
 }
 RectangleArena {
-  floorSize 5 5
+  translation 0.05 0 -0.05
+  floorSize 10 10
+  floorTileSize 0.6 0.6
 }
 SolidBox {
   translation -1.09731 0.2377375001039332 -1.15256
