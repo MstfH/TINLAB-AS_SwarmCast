@@ -6,6 +6,7 @@ PROTO OmniBot [
     Robot {
     translation IS translation
     rotation 1 0 0 0
+    supervisor TRUE
     children [
         DEF SKIRT Transform {
         children [
@@ -812,9 +813,10 @@ PROTO OmniBot [
             }
             }
         ]
-        name "transmitter"
+        name "emitter"
         }
         Receiver {
+        name "receiver"
         translation 0 0.15 0
         children [
             USE antenna

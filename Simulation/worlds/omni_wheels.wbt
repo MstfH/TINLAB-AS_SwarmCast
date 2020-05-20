@@ -20,46 +20,41 @@ RectangleArena {
   floorSize 10 10
   floorTileSize 0.6 0.6
 }
-SolidBox {
-  translation -1.09731 0.2377375001039332 -1.15256
-  rotation -0.3520310156358334 0.318649790868044 -0.8800775390896846 2.232199401272946e-18
-  size 0.5 0.5 0.5
-  physics Physics {
-  }
-}
-SolidBox {
-  translation 1.21269 0.2377375001039332 -1.15256
-  rotation -0.3520310156358334 0.318649790868044 -0.8800775390896846 2.232199401272946e-18
-  name "box(1)"
-  size 0.5 0.5 0.5
-  physics Physics {
-  }
-}
-SolidBox {
-  translation 1.24269 0.237738 1.11744
-  rotation -0.7005929531808247 0.07054384850712524 0.7100655458414911 3.60049804085859e-18
-  name "box(2)"
-  size 0.5 0.5 0.5
-  physics Physics {
-  }
-}
-SolidBox {
-  translation -1.02731 0.2377375001039332 1.14744
-  rotation -0.3520310156358334 0.318649790868044 -0.8800775390896846 2.232199401272946e-18
-  name "box(3)"
-  size 0.5 0.5 0.5
-  physics Physics {
-  }
-}
 DEF SERVER Robot {
   children [
     Receiver {
     }
     Emitter {
+      channel 1134
     }
   ]
   name "robot(1)"
   controller "server_controller"
 }
 OmniBot {
+  translation 1.34 0.06 1.51
+}
+OmniBot {
+  translation -0.22 0.06 1.45
+}
+OmniBot {
+  translation 0.62 0.06 -0.78
+}
+OmniBot {
+  translation -0.58 0.06 0.68
+}
+OmniBot {
+  translation -0.3 0.06 -0.23
+}
+OmniBot {
+  translation 0.47 0.06 0.5
+}
+OmniBot {
+  translation 1.6 0.06 -0.33
+}
+OmniBot {
+  translation 0.53 0.06 1.95
+}
+OmniBot {
+  translation 1.76 0.06 0.7
 }
