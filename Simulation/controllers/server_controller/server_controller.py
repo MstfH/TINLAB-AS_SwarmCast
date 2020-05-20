@@ -1,32 +1,25 @@
-"""server_controller controller."""
+from controller import Supervisor
+from math import sqrt
 
-# You may need to import some classes of the controller module. Ex:
-#  from controller import Robot, Motor, DistanceSensor
-from controller import Robot
+server = Supervisor()
+TIME_STEP = int(server.getBasicTimeStep())
 
-# create the Robot instance.
-robot = Robot()
+# do this once only
+# robot_node = supervisor.getFromDef("OMNI_WHEELS")
+# trans_field = robot_node.getField("translation")
 
-# get the time step of the current world.
-timestep = int(robot.getBasicTimeStep())
+botNode = []
+botNames = [
+    "bot1", "bot2"]
 
-# You should insert a getDevice-like function in order to get the
-# instance of a device of the robot. Something like:
-#  motor = robot.getMotor('motorname')
-#  ds = robot.getDistanceSensor('dsname')
-#  ds.enable(timestep)
+# #populate botNode
 
-# Main loop:
-# - perform simulation steps until Webots is stopping the controller
-while robot.step(timestep) != -1:
-    # Read the sensors:
-    # Enter here functions to read sensor data, like:
-    #  val = ds.getValue()
-
-    # Process sensor data here.
-
-    # Enter here functions to send actuator commands, like:
-    #  motor.setPosition(10.0)
-    pass
-
-# Enter here exit cleanup code.
+for i in range(len(botNames)):
+    botNode.append(server.getFromDef(botNames[i]))
+    
+    
+#print ID + translation
+while server.step(TIME_STEP) != -1:
+    for i in range(len(botNode)):
+        transval = botNode[i].getField("translation").getSFVec3f()
+        print(i, ": ", transval)

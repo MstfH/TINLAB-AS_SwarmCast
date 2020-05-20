@@ -1,5 +1,6 @@
 PROTO OmniBot [
   field SFVec3f    translation  0 0.06 0
+  field SFString   controller "bot_controller"
 ]
 {
     Robot {
@@ -1074,6 +1075,6 @@ PROTO OmniBot [
     ]
     physics Physics {
     }
-    controller "bot_controller"
+    controller IS controller
     }
 }

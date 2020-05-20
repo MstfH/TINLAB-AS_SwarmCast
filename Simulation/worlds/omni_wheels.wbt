@@ -8,7 +8,7 @@ WorldInfo {
 }
 Viewpoint {
   orientation 1 0 0 4.71238898038469
-  position 0 18.04963218266823 -2.886579864025407e-15
+  position 0 2.1628806306721446 3.1672669800379985e-17
 }
 TexturedBackground {
 }
@@ -57,6 +57,11 @@ DEF SERVER Robot {
   ]
   name "robot(1)"
   controller "server_controller"
+  supervisor TRUE
 }
-OmniBot {
+DEF bot1 OmniBot {
+  controller "omni_wheel_controller"
+}
+DEF bot2 OmniBot {
+  translation 0.34 0.06 0
 }

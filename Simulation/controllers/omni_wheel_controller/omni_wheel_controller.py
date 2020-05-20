@@ -21,8 +21,8 @@ while robot.step(robot.timestep) != -1:
     state_machine.execute_state()
     robot.led.set(random.randint(16, (int("0xffffff", 16)))) #only test/demo, can be removed
 
-    robot.transmitter.send("Hello from omnibot".encode())
-    if robot.receiver.getQueueLength() != 0:
-        print("rx:", robot.receiver.getData()," strength:", robot.receiver.getSignalStrength(), " direction:", robot.receiver.getEmitterDirection())
+    # robot.transmitter.send("Hello from omnibot".encode())
+    # if robot.receiver.getQueueLength() != 0:
+        # print("rx:", robot.receiver.getData()," strength:", robot.receiver.getSignalStrength(), " direction:", robot.receiver.getEmitterDirection())
 
     
