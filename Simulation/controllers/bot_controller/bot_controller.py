@@ -1,32 +1,86 @@
 """bot_controller controller."""
 
-# You may need to import some classes of the controller module. Ex:
-#  from controller import Robot, Motor, DistanceSensor
-from controller import Robot
+from controller import Supervisor
+import pickle
+import random
 
-# create the Robot instance.
-robot = Robot()
+SPEED_FACTOR = 3
+TIME_STEP = 32
+ID = random.randint(1, 10000)
 
-# get the time step of the current world.
-timestep = int(robot.getBasicTimeStep())
+supervisor = Supervisor()
+robot_node = supervisor.getSelf()
+translation_field = robot_node.getField("translation")
 
-# You should insert a getDevice-like function in order to get the
-# instance of a device of the robot. Something like:
-#  motor = robot.getMotor('motorname')
-#  ds = robot.getDistanceSensor('dsname')
-#  ds.enable(timestep)
+emitter = supervisor.getEmitter("emitter")
+receiver = supervisor.getReceiver("receiver")
+receiver.enable(100)
+receiver.setChannel(ID)
 
-# Main loop:
-# - perform simulation steps until Webots is stopping the controller
-while robot.step(timestep) != -1:
-    # Read the sensors:
-    # Enter here functions to read sensor data, like:
-    #  val = ds.getValue()
+wheels = [
+    supervisor.getMotor("wheel1"),
+    supervisor.getMotor("wheel2"),
+    supervisor.getMotor("wheel3")
+]
 
-    # Process sensor data here.
+for wheel in wheels:
+    wheel.setPosition(float('inf'))
+    wheel.setVelocity(0.0)
 
-    # Enter here functions to send actuator commands, like:
-    #  motor.setPosition(10.0)
-    pass
 
-# Enter here exit cleanup code.
+def send_message(message):
+    emitter.send(pickle.dumps((ID, message)))
+
+
+def stop_wheels():
+    wheels[0].setVelocity(0)
+    wheels[1].setVelocity(0)
+    wheels[2].setVelocity(0)
+
+
+def move_north():
+    wheels[0].setVelocity(0)
+    wheels[1].setVelocity(-SPEED_FACTOR)
+    wheels[2].setVelocity(SPEED_FACTOR)
+
+
+def move_east():
+    wheels[0].setVelocity(-2 * SPEED_FACTOR)
+    wheels[1].setVelocity(SPEED_FACTOR)
+    wheels[2].setVelocity(SPEED_FACTOR)
+
+
+def move_south():
+    wheels[0].setVelocity(0)
+    wheels[1].setVelocity(SPEED_FACTOR)
+    wheels[2].setVelocity(-SPEED_FACTOR)
+
+
+def move_west():
+    wheels[0].setVelocity(2 * SPEED_FACTOR)
+    wheels[1].setVelocity(-SPEED_FACTOR)
+    wheels[2].setVelocity(-SPEED_FACTOR)
+
+
+def move(direction):
+    move_map = {
+        "N": move_north,
+        "E": move_east,
+        "S": move_south,
+        "W": move_west,
+        "I": stop_wheels
+    }
+    func = move_map.get(direction)
+    func()
+
+
+while supervisor.step(TIME_STEP) != -1:
+    while receiver.getQueueLength() > 0:
+        raw_data = receiver.getData()
+        direction = pickle.loads(raw_data)
+        move(direction)
+        receiver.nextPacket()
+
+    current_position = translation_field.getSFVec3f()
+    (x, _, z) = current_position
+    send_message([x, z])
