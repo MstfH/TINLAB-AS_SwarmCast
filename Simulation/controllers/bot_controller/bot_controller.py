@@ -14,8 +14,19 @@ translation_field = robot_node.getField("translation")
 
 emitter = supervisor.getEmitter("emitter")
 receiver = supervisor.getReceiver("receiver")
-receiver.enable(100)
+receiver.enable(TIME_STEP)
 receiver.setChannel(ID)
+
+##populate list of distance sensors
+ds = []
+dsNames = [
+    'ds0', 'ds1', 'ds2', 'ds3',
+    'ds4', 'ds5', 'ds6', 'ds7'
+]
+for i in range(8):
+    ds.append(supervisor.getDistanceSensor(dsNames[i]))
+    ds[i].enable(TIME_STEP)
+##
 
 wheels = [
     supervisor.getMotor("wheel1"),
@@ -26,6 +37,17 @@ wheels = [
 for wheel in wheels:
     wheel.setPosition(float('inf'))
     wheel.setVelocity(0.0)
+
+
+def readSensors():
+    # reads sensors and returns list of sensor values
+    dsValues = []
+    for i in range(8):
+        value = round(ds[i].getValue(), 2)
+        if(value == 1000):
+            value = -1
+        dsValues.append(value)
+    return dsValues
 
 
 def send_message(message):
@@ -81,7 +103,9 @@ while supervisor.step(TIME_STEP) != -1:
         direction = pickle.loads(raw_data)
         move(direction)
         receiver.nextPacket()
-
+    dsValues = readSensors()
     current_position = translation_field.getSFVec3f()
     (x, _, z) = current_position
-    send_message([x, z])
+    x = round(x,3)
+    z = round(z,3)
+    send_message(([x, z], dsValues))
