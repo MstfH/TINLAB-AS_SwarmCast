@@ -12,13 +12,13 @@ import robot
 
 # The robots attributes. The ID needs to be unique for each robot (random atm for testing)
 robotInfo = {
-    "R-ID": 1,
-    "ID-List": [1],
-    "G-ID": 1,
+    "R-ID": 2,
+    "ID-List": [2],
+    "G-ID": 2,
     "G-Size": 1
 }
 
-distanceInBetween = 6   # Distance between the robot and the object.
+distanceInBetween = 4   # Distance between the robot and the object.
 sensorRange = 5         # The range of the sensor.
 TWaiting = 5            # Waiting time in sec.
 TAvoiding = 2          # Avoiding time in sec.
@@ -38,7 +38,7 @@ def search():
     while time.time() < tEnd:
         robot.step(robot.timestep)
 
-    distanceInBetween = 4   # for testing
+    distanceInBetween = 6   # for testing
     sensorRange = 5         # for testing
 
     # If an object is detected, send an HELLO message to the object and wait for response.
@@ -86,6 +86,7 @@ def wait():
 
     if distanceInBetween < sensorRange:
         if robot.receiver.getQueueLength() > 0:
+            print("Number of packets:", str(robot.receiver.getQueueLength()))
             rawData = robot.receiver.getData().decode()
             receivedMessage = json.loads(rawData)
             message = receivedMessage
@@ -154,7 +155,6 @@ def searchToWait(message):
             "G-ID": robotInfo.get("G-ID"),
             "Tag": "joining"
         }
-
         sendMessage(PROPAGATE)
 
         wait()
@@ -195,7 +195,6 @@ def searchToWait(message):
 
 # This function regulates the steps taken during the search to wait transition.
 def waitToSearch():
-    print("transitioning from wait to search")
     # Reset robot's attributes after leaving the group
     robotInfo["ID-List"].clear()
     robotInfo["ID-List"].append(robotInfo.get("R-ID"))
@@ -213,7 +212,7 @@ def transition(message):
         print("to wait")
         searchToWait(message)
     elif distanceInBetween >= sensorRange and message.get("Tag") == "leaving":
-        print("to search with leaving tag")
+        print("to search with tag")
         waitToSearch()
     else:
         print("to search")
@@ -241,12 +240,55 @@ def getMessage():
     return receivedMessage
 
 
+# def radio():
+#     receivedMessage = ""
+
+#     # Messages
+#     HELLO_test = {
+#         "Name": "HELLO",
+#         "R-ID": 0
+#     }
+
+#     ACK_test = {
+#         "Name": "ACK",
+#         "R-ID": 1,
+#         "G-ID": 1,
+#         "G-Size": 1,
+#         "ID-List": [1],
+#         "State": "joining"
+#     }
+
+#     PROPAGATE_test = {
+#         "Name": "PROPAGATE",
+#         "R-ID": 0,
+#         "G-ID": 0,
+#         "Tag": ""
+#     }
+
+#     tempDict = {}
+
+#     jsonMessage = json.dumps(HELLO_test)
+
+#     robot.emitter.send(jsonMessage.encode())
+
+#     if robot.receiver.getQueueLength() > 0:
+#         # print("Rx:", robot.receiver.getData(), " strength:", robot.receiver.getSignalStrength(
+#         # ), " direction:", robot.receiver.getEmitterDirection())
+
+#         rawData = robot.receiver.getData().decode()
+#         receivedMessage = json.loads(rawData)
+#         tempDict = receivedMessage
+#         print("RECEIVED message:", tempDict)
+
+#     return tempDict
+
+
 def run():
     receivedMessage = {}
 
     # Loop to keep the aggregation algorithm running unitl the goal is reached (an aggregation of 25 robots)
     goalNumber = 2
-    while robotInfo.get("G-Size") < goalNumber:  # TODO: test if g-size changes
+    while robotInfo.get("G-Size") < goalNumber:
 
         if robot.receiver.getQueueLength() > 0:
             rawData = robot.receiver.getData().decode()
