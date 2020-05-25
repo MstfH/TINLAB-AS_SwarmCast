@@ -47,11 +47,11 @@ current_shell = 0
 
 bots = []
 bot_ids = []
-
+collision_queue = []
 robot = Robot()
 emitter = robot.getEmitter("emitter")
 receiver = robot.getReceiver("receiver")
-receiver.enable(100)
+receiver.enable(TIME_STEP)
 
 
 def get_shell(point):
@@ -120,6 +120,15 @@ def current_shell_in_formation():
 if GRID_SIZE % 2 == 0:
     print("WARNING: Please set GRID_SIZE to an uneven number.")
 
+def collisionDetection(dsValues, proximityLimit = 100):
+    #returns distance sensor value when closer than proximityLimit
+    #or -1 if no collision is immenent
+    for i in range(len(dsValues)):
+        if (dsValues[i] > 0 and dsValues[i] < proximityLimit):
+            return i
+        else:
+            return -1
+    
 while robot.step(TIME_STEP) != -1:
     if len(bots) > GRID_SIZE**2:
         print("WARNING: Excess of bots.")
@@ -128,6 +137,10 @@ while robot.step(TIME_STEP) != -1:
         bot = None
         raw_data = receiver.getData()
         (id, position) = pickle.loads(raw_data)
+        print(pickle.loads(raw_data))
+        (id, message) = pickle.loads(raw_data)
+        position = message.get("position")
+        dsValues = message.get("dsValues")
         emitter.setChannel(id)
 
         if id in bot_ids:
@@ -136,6 +149,13 @@ while robot.step(TIME_STEP) != -1:
                 "position": position,
                 "state": get_state(bot)
             })
+            
+            if((collisionDetection(dsValues)) > 0):
+                print("Proximity Warning bot: ", bot.get("id"))
+                collision_queue.append({bot.get("id")})
+                new_state = IDLE
+            print(new_state, bot.get("id"))
+            send_message(new_state)
 
         else:
             # print(f"Registered bot {id} @ {position}")
