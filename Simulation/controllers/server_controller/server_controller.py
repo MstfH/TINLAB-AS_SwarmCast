@@ -135,7 +135,11 @@ while robot.step(TIME_STEP) != -1:
                 "position": position,
                 "state": get_state(bot)
             })
-            
+            #TODO check from rebase
+            # bot.update({"position": position})
+            # new_state = get_state(
+            #     bot.get("position"), bot.get("target")
+            # )
             if((collisionDetection(dsValues)) > 0):
                 print("Proximity Warning bot: ", bot.get("id"))
                 collision_queue.append({bot.get("id")})
