@@ -861,7 +861,7 @@ PROTO OmniBot [
                 1 1000 0
             ]
         type "generic"
-            numberOfRays 2
+            numberOfRays 1
             aperture 1
             }
             DistanceSensor {
@@ -891,7 +891,7 @@ PROTO OmniBot [
                 1 1000 0
             ]
         type "generic"
-            numberOfRays 2
+            numberOfRays 1
             aperture 1
             }
             DistanceSensor {
@@ -921,7 +921,7 @@ PROTO OmniBot [
                 1 1000 0
             ]
         type "generic"
-            numberOfRays 2
+            numberOfRays 1
             aperture 1
             }
             DistanceSensor {
@@ -951,7 +951,7 @@ PROTO OmniBot [
                 1 1000 0
             ]
         type "generic"
-            numberOfRays 2
+            numberOfRays 1
             aperture 1
             }
             DistanceSensor {
@@ -981,7 +981,7 @@ PROTO OmniBot [
                 1 1000 0
             ]
         type "generic"
-            numberOfRays 2
+            numberOfRays 1
             aperture 1
             }
             DistanceSensor {
@@ -1011,7 +1011,7 @@ PROTO OmniBot [
                 1 1000 0
             ]
         type "generic"
-            numberOfRays 2
+            numberOfRays 1
             aperture 1
             }
             DistanceSensor {
@@ -1041,7 +1041,7 @@ PROTO OmniBot [
                 1 1000 0
             ]
         type "generic"
-            numberOfRays 2
+            numberOfRays 1
             aperture 1
             }
             DistanceSensor {
@@ -1071,7 +1071,7 @@ PROTO OmniBot [
                 1 1000 0
             ]
         type "generic"
-            numberOfRays 2
+            numberOfRays 1
             aperture 1
             }
         ]
