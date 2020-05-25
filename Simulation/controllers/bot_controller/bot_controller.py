@@ -64,11 +64,12 @@ def move_west():
 
 def move(direction):
     move_map = {
+        "I": stop_wheels,
         "N": move_north,
         "E": move_east,
         "S": move_south,
         "W": move_west,
-        "I": stop_wheels
+        "IF": stop_wheels
     }
     func = move_map.get(direction)
     func()
