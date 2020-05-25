@@ -44,11 +44,11 @@ state = State.WAITING_FOR_CONNECTIONS
 
 bots = []
 bot_ids = []
-
+collision_queue = []
 robot = Robot()
 emitter = robot.getEmitter("emitter")
 receiver = robot.getReceiver("receiver")
-receiver.enable(100)
+receiver.enable(TIME_STEP)
 
 
 def calculate_optimal_assignment():
@@ -84,7 +84,15 @@ def get_state(position, target):
 
     return IDLE
 
-
+def collisionDetection(dsValues, proximityLimit = 100):
+    #returns distance sensor value when closer than proximityLimit
+    #or -1 if no collision is immenent
+    for i in range(len(dsValues)):
+        if (dsValues[i] > 0 and dsValues[i] < proximityLimit):
+            return i
+        else:
+            return -1
+    
 while robot.step(TIME_STEP) != -1:
     if len(bots) > GRID_WIDTH * GRID_HEIGHT:
         print("WARNING: Excess of bots")
@@ -92,6 +100,10 @@ while robot.step(TIME_STEP) != -1:
     while receiver.getQueueLength() > 0:
         raw_data = receiver.getData()
         (id, position) = pickle.loads(raw_data)
+        print(pickle.loads(raw_data))
+        (id, message) = pickle.loads(raw_data)
+        position = message.get("position")
+        dsValues = message.get("dsValues")
         emitter.setChannel(id)
 
         if id in bot_ids:
@@ -100,6 +112,11 @@ while robot.step(TIME_STEP) != -1:
             new_state = get_state(
                 bot.get("position"), bot.get("target")
             )
+            if((collisionDetection(dsValues)) > 0):
+                print("Proximity Warning bot: ", bot.get("id"))
+                collision_queue.append({bot.get("id")})
+                new_state = IDLE
+            print(new_state, bot.get("id"))
             send_message(new_state)
 
         else:
