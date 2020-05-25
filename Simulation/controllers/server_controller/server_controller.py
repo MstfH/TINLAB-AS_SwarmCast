@@ -123,11 +123,10 @@ if GRID_SIZE % 2 == 0:
 def collisionDetection(dsValues, proximityLimit = 100):
     #returns distance sensor value when closer than proximityLimit
     #or -1 if no collision is immenent
-    for i in range(len(dsValues)):
-        if (dsValues[i] > 0 and dsValues[i] < proximityLimit):
-            return i
-        else:
-            return -1
+    for i in dsValues:
+        if (i > 0 and i < proximityLimit):
+            return dsValues.index(i)
+    return -1
     
 while robot.step(TIME_STEP) != -1:
     if len(bots) > GRID_SIZE**2:
@@ -137,7 +136,7 @@ while robot.step(TIME_STEP) != -1:
         bot = None
         raw_data = receiver.getData()
         (id, position) = pickle.loads(raw_data)
-        print(pickle.loads(raw_data))
+        #print(pickle.loads(raw_data))
         (id, message) = pickle.loads(raw_data)
         position = message.get("position")
         dsValues = message.get("dsValues")
@@ -145,29 +144,37 @@ while robot.step(TIME_STEP) != -1:
 
         if id in bot_ids:
             bot = next(bot for bot in bots if bot.get("id") == id)
+            print(id, dsValues)
             bot.update({
                 "position": position,
+                "dsValues": dsValues,
                 "state": get_state(bot)
             })
-            
-            if((collisionDetection(dsValues)) > 0):
-                print("Proximity Warning bot: ", bot.get("id"))
-                collision_queue.append({bot.get("id")})
-                new_state = IDLE
-            print(new_state, bot.get("id"))
-            send_message(new_state)
-
+            collisionAngle = collisionDetection(bot.get("dsValues"))
+            if(collisionAngle != -1):
+                print("Proximity Warning bot:", id, "angle:", collisionAngle)
+                bot.update({
+                    "state": IDLE,
+                    "collision": collisionAngle
+                })
+                if collision_queue.count([bot.get("id"), bot.get("collision")]) == 0:
+                    collision_queue.append([bot.get("id"), bot.get("collision")])
+            #print(new_state, bot.get("id"))
+            #send_message(new_state)
+        
         else:
             # print(f"Registered bot {id} @ {position}")
             bots.append({
                 "id": id,
                 "position": np.array(position),
                 "target": None,
-                "state": IDLE
+                "state": IDLE,
+                "dsValues": None,
+                "collision": None
             })
             bot_ids.append(id)
             bot = bots[-1]
-
+        print("c",collision_queue)
         send_message(bot.get("state"))
 
         if state == State.WAITING_FOR_CONNECTIONS and len(bots) == GRID_SIZE**2:
