@@ -109,4 +109,8 @@ while supervisor.step(TIME_STEP) != -1:
     (x, _, z) = current_position
     x = round(x,3)
     z = round(z,3)
-    send_message(([x, z], dsValues))
+    message = {
+        "position" : [x, z],
+        "dsValues" : dsValues
+        }
+    send_message(message)
