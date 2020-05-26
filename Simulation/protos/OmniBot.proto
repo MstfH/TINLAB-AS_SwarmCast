@@ -861,7 +861,7 @@ PROTO OmniBot [
                 1 1000 0
             ]
         type "generic"
-            numberOfRays 2
+            numberOfRays 1
             aperture 1
             }
             DistanceSensor {
@@ -891,7 +891,7 @@ PROTO OmniBot [
                 1 1000 0
             ]
         type "generic"
-            numberOfRays 2
+            numberOfRays 1
             aperture 1
             }
             DistanceSensor {
@@ -921,7 +921,7 @@ PROTO OmniBot [
                 1 1000 0
             ]
         type "generic"
-            numberOfRays 2
+            numberOfRays 1
             aperture 1
             }
             DistanceSensor {
@@ -951,7 +951,7 @@ PROTO OmniBot [
                 1 1000 0
             ]
         type "generic"
-            numberOfRays 2
+            numberOfRays 1
             aperture 1
             }
             DistanceSensor {
@@ -981,7 +981,7 @@ PROTO OmniBot [
                 1 1000 0
             ]
         type "generic"
-            numberOfRays 2
+            numberOfRays 1
             aperture 1
             }
             DistanceSensor {
@@ -1011,7 +1011,7 @@ PROTO OmniBot [
                 1 1000 0
             ]
         type "generic"
-            numberOfRays 2
+            numberOfRays 1
             aperture 1
             }
             DistanceSensor {
@@ -1041,11 +1041,11 @@ PROTO OmniBot [
                 1 1000 0
             ]
         type "generic"
-            numberOfRays 2
+            numberOfRays 1
             aperture 1
             }
             DistanceSensor {
-        translation -0.0707105 0.08 -0.070711
+        translation -0.106 0.08 -0.106
         rotation 0 1 0 2.35619
             children [
                 DEF SENSOR Transform {
@@ -1071,7 +1071,7 @@ PROTO OmniBot [
                 1 1000 0
             ]
         type "generic"
-            numberOfRays 2
+            numberOfRays 1
             aperture 1
             }
         ]
