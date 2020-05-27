@@ -9,17 +9,17 @@ import robot
 
 # ---SwarmCast decentralized aggregation algorithm---
 
-# Robot aggregation attributes.
+# Robot aggregation attributes
 robotInfo = {
-    "R-ID": 1,
-    "ID-List": [1],
-    "G-ID": 1,
+    "R-ID": 2,
+    "ID-List": [2],
+    "G-ID": 2,
     "G-Size": 1
 }
 
 TWaiting = 3            # Waiting time in sec.
 TAvoiding = 5           # Avoiding time in sec.
-goalNumber = 2          # Total aggregation goal number.
+goalNumber = 2          # Total aggregation goal number
 
 # During the aggregation the robot has 2 states (behaviours). The search and the wait state.
 # The search state is when the robot is searching for another robot, so that it can start or join an aggregation with another robot.
@@ -68,6 +68,9 @@ def wait():
 
     message = {}
 
+    # for testing if the WTimer resets after receiving propagation message
+    print("Waiting time:", tEnd)
+
     while time.time() < tEnd:
         robot.step(robot.timestep)
 
@@ -112,6 +115,9 @@ def wait():
 
                     WTimer = k * robotInfo.get("G-Size")
                     tEnd = time.time() + WTimer
+
+                    print("New Group size:", robotInfo.get("G-Size"))
+                    print("New timer:", tEnd)
 
                     # TODO: Check if the message is being broadcasted properly to bots in aggregation
                     sendMessage(message)
@@ -159,7 +165,6 @@ def searchToWait(message):
     # If a HELLO message is received, send an ACK message in return.
     elif message.get("Name") == "HELLO" and message.get("R-ID") < robotInfo.get("R-ID"):
         print("HELLO - transitioning from search to wait")
-        # TODO: send ACK message to sender of HELLO with UNIQUE(P2P) channel. Right now its broadcasting...
         ACK = {
             "Name": "ACK",
             "R-ID": robotInfo.get("R-ID"),

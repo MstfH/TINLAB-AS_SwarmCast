@@ -1,10 +1,8 @@
-"""omni_controller controller."""
+"""robot_2 controller."""
 
 import random
 
 import robot
-import state_machine
-import jobs
 import aggregation
 
 
@@ -18,9 +16,9 @@ def readSensors():
 
 while robot.step(robot.timestep) != -1:
 
-    aggregation.run()
-    readSensors()
+    s = readSensors()
+    print("Sensor values: ", s)
 
-    # state_machine.state = state_machine.get_next_state()
-    # state_machine.execute_state()
+    aggregation.run()
+
     robot.led.set(random.randint(16, (int("0xffffff", 16))))
