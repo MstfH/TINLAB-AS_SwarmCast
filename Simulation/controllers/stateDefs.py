@@ -8,7 +8,6 @@ class ServerState(Enum):
     DONE = auto()
 
 class BotState(Enum):
-    #IDLE = "I"
     IDLE = auto()
     TRAVELLING_NORTH = auto()
     TRAVELLING_EAST = auto()

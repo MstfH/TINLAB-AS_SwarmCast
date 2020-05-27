@@ -10,24 +10,6 @@ sys.path.append('..')
 from stateDefs import ServerState as ServerState
 from stateDefs import BotState as BotState
 
-#from enum import Enum, auto
-
-##TODO remove after stateDefs
-# class State(Enum):
-#     WAITING_FOR_CONNECTIONS = auto()
-#     CALCULATING_OPTIMAL_ASSIGNMENT = auto()
-#     WAITING_FOR_FORMATION = auto()
-#     ASSIGNING_COLORS = auto()
-#     DONE = auto()
-
-
-# IDLE = "I"
-# TRAVELLING_NORTH = "N"
-# TRAVELLING_EAST = "E"
-# TRAVELLING_SOUTH = "S"
-# TRAVELLING_WEST = "W"
-# IN_FORMATION = "IF"
-
 TIME_STEP = 32
 POS_TOLERANCE = 0.05
 GRID_SIZE = 3
@@ -77,13 +59,15 @@ def calculate_optimal_assignment():
             cost[i, j] = np.sum(np.absolute(
                 bots[i].get("position") - GRID_POSITIONS[j]))
 
+    np.set_printoptions(precision=2, suppress=True)
+    print(cost)
     rows, cols = linear_sum_assignment(cost)
     for (row_i, col_i) in zip(rows, cols):
         bots[row_i].update({
             "target": GRID_POSITIONS[col_i],
             "shell": get_shell(GRID_POSITIONS[col_i])
         })
-
+        print(bots[row_i])
     state = ServerState.WAITING_FOR_FORMATION
 
 
@@ -143,7 +127,7 @@ while robot.step(TIME_STEP) != -1:
             })
 
         else:
-            # print(f"Registered bot {id} @ {position}")
+            print(f"Registered bot {id} @ {position}")
             bots.append({
                 "id": id,
                 "position": np.array(position),
@@ -154,17 +138,6 @@ while robot.step(TIME_STEP) != -1:
             bot = bots[-1]
 
         send_message(bot.get("state"))
-##TODO  REMOVE AFTER STATEDEFS
-        # if state == State.WAITING_FOR_CONNECTIONS and len(bots) == GRID_SIZE**2:
-        #     state = State.CALCULATING_OPTIMAL_ASSIGNMENT
-        #     calculate_optimal_assignment()
-
-        # if current_shell_in_formation():
-        #     if current_shell == MAX_SHELL:
-        #         state = State.ASSIGNING_COLORS
-
-        #     if state == State.WAITING_FOR_FORMATION:
-        #         current_shell += 1
 
         if state == ServerState.WAITING_FOR_CONNECTIONS and len(bots) == GRID_SIZE**2:
             state = ServerState.CALCULATING_OPTIMAL_ASSIGNMENT
