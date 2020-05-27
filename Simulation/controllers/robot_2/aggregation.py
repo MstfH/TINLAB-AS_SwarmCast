@@ -9,7 +9,7 @@ import robot
 
 # ---SwarmCast decentralized aggregation algorithm---
 
-# Robot aggregation attributes
+# Robot aggregation attributes.
 robotInfo = {
     "R-ID": 2,
     "ID-List": [2],
@@ -19,11 +19,11 @@ robotInfo = {
 
 TWaiting = 3            # Waiting time in sec.
 TAvoiding = 5           # Avoiding time in sec.
-goalNumber = 2          # Total aggregation goal number
+goalNumber = 2          # Total aggregation goal number.
 
 # During the aggregation the robot has 2 states (behaviours). The search and the wait state.
 # The search state is when the robot is searching for another robot, so that it can start or join an aggregation with another robot.
-# The robot goes into the wait state when it detects an object, so that it can communicate with the object.
+# The robot goes into the wait state when it detects a robot, so that it can communicate with the robot.
 
 
 def search():
@@ -42,7 +42,7 @@ def search():
             "R-ID": robotInfo.get("R-ID")
         }
 
-        sendMessage(HELLO)
+        sendBroadcastMessage(HELLO)
         response = {}
         response = getMessage()
 
@@ -68,9 +68,6 @@ def wait():
 
     message = {}
 
-    # for testing if the WTimer resets after receiving propagation message
-    print("Waiting time:", tEnd)
-
     while time.time() < tEnd:
         robot.step(robot.timestep)
 
@@ -90,7 +87,7 @@ def wait():
         # If the message received is HELLO, send ACK message as a response.
         if message.get("Name") == "HELLO":
             print("Sending ACK to HELLO")
-            # TODO: send ACK message to sender of HELLO with UNIQUE(P2P) channel. Right now its broadcasting...
+
             ACK = {
                 "Name": "ACK",
                 "R-ID": robotInfo.get("R-ID"),
@@ -100,14 +97,14 @@ def wait():
                 "State": "wait"
             }
 
-            sendMessage(ACK)
+            sendP2PMessage(ACK, message.get("R-ID"))
 
         elif message.get("Name") == "PROPAGATE":
             print("Receiving PROPAGATE after ACK")
             if robotInfo.get("G-ID") == message.get("G-ID"):
                 # If the message received is PROPAGATE and the tag is joining, this robot will add the new robot to the group.
                 if message.get("R-ID") not in robotInfo.get("ID-List") and message.get("Tag") == "joining":
-                    print("Joining group")
+                    print("New robot is joining the group")
                     robotInfo.get(
                         "ID-List").append(message.get("R-ID"))
                     newGSize = robotInfo.get("G-Size") + 1
@@ -116,23 +113,20 @@ def wait():
                     WTimer = k * robotInfo.get("G-Size")
                     tEnd = time.time() + WTimer
 
-                    print("New Group size:", robotInfo.get("G-Size"))
-                    print("New timer:", tEnd)
-
                     # TODO: Check if the message is being broadcasted properly to bots in aggregation
-                    sendMessage(message)
+                    sendBroadcastMessage(message)
 
                 # If the message received is PROPAGATE and the tag is leaving, this robot will remove the robot to the group.
                 else:
                     if message.get("R-ID") in robotInfo.get("ID-List") and message.get("Tag") == "leaving":
-                        print("Leaving group")
+                        print("A robot is leaving the group")
                         robotInfo.get(
                             "ID-List").remove(message.get("R-ID"))
                         newGSize = robotInfo.get("G-Size") - 1
                         robotInfo.update({"G-Size": newGSize})
 
                         # TODO: Check if the message is being broadcasted properly to bots in aggregation
-                        sendMessage(message)
+                        sendBroadcastMessage(message)
 
     waitToSearch()
 
@@ -158,7 +152,7 @@ def searchToWait(message):
             "Tag": "joining"
         }
 
-        sendMessage(PROPAGATE)
+        sendBroadcastMessage(PROPAGATE)
 
         wait()
 
@@ -174,7 +168,7 @@ def searchToWait(message):
             "State": "wait"
         }
 
-        sendMessage(ACK)
+        sendP2PMessage(ACK, message.get("R-ID"))
 
         wait()
 
@@ -184,6 +178,10 @@ def searchToWait(message):
 def waitToSearch():
     print("Transitioning from wait to search")
 
+    # Stop the loop if aggregation goal number is reached
+    if robotInfo.get("G-Size") == goalNumber:
+        return
+
     # Setup and broadcasting a PROPAGATE message with "leaving" tag.
     PROPAGATE = {
         "Name": "PROPAGATE",
@@ -192,7 +190,7 @@ def waitToSearch():
         "Tag": "leaving"
     }
 
-    sendMessage(PROPAGATE)
+    sendBroadcastMessage(PROPAGATE)
 
     # Reset robot's attributes after leaving the group.
     robotInfo["ID-List"].clear()
@@ -224,14 +222,27 @@ def readSensors():
             detected = True
     return detected
 
-# This function sends messages via an emmiter
+# This function sends broadcast HELLO and PROPAGATE messages via an emmiter
 
 
-def sendMessage(MessageToSend):
+def sendBroadcastMessage(MessageToSend):
+    robot.emitter.setChannel(robot.emitter.CHANNEL_BROADCAST)
     jsonMessage = json.dumps(MessageToSend)
     robot.emitter.setRange(101)
     robot.emitter.send(jsonMessage.encode())
-    print("Sending:", MessageToSend)
+    robot.emitter.setChannel(robotInfo.get("R-ID"))
+    print("Sending broadcast:", MessageToSend)
+
+# This function sends P2P ACK messages via an emmiter
+
+
+def sendP2PMessage(MessageToSend, channel):
+    robot.emitter.setChannel(channel)
+    jsonMessage = json.dumps(MessageToSend)
+    robot.emitter.setRange(101)
+    robot.emitter.send(jsonMessage.encode())
+    robot.emitter.setChannel(robotInfo.get("R-ID"))
+    print("Sending P2P:", MessageToSend)
 
 # This function receives message via a receiver
 
@@ -252,6 +263,8 @@ def getMessage():
 
 
 def run():
+    robot.emitter.setChannel(robotInfo.get("R-ID"))
+    robot.receiver.setChannel(robotInfo.get("R-ID"))
     # Loop to keep the aggregation algorithm running until the goal is reached (an aggregation of 25 robots)
     while robotInfo.get("G-Size") < goalNumber:
         robot.step(robot.timestep)
