@@ -29,13 +29,15 @@ goalNumber = 2          # Total aggregation goal number.
 def search():
     print("Searching state")
 
-    # TODO: move forward in a random direction
+    # Move forward in a random direction
+    robot.move("S")
 
     detected = readSensors()
 
     if detected:
 
-        # TODO: stop moving forward
+        # Stop moving forward
+        robot.move("I")
 
         HELLO = {
             "Name": "HELLO",
@@ -49,14 +51,14 @@ def search():
         if response.get("Name") == "ACK" or response.get("Name") == "HELLO":
             searchToWait(response)
 
-    else:
-        print("Respond not received, moving on")
-        tEnd = time.time() + TAvoiding
-        while time.time() < tEnd:
-            robot.step(robot.timestep)
-            print("Avoiding obstacles")
-            # TODO: rotate and look for a free direction,
-            #       move forward in a free random direction and avoid obstacles
+        else:
+            print("Respond not received, moving on")
+            tEnd = time.time() + TAvoiding
+            while time.time() < tEnd:
+                robot.step(robot.timestep)
+                print("Avoiding obstacles")
+                # TODO: rotate and look for a free direction,
+                #       move forward in a free random direction and avoid obstacles
 
 
 def wait():
@@ -100,10 +102,11 @@ def wait():
             sendP2PMessage(ACK, message.get("R-ID"))
 
         elif message.get("Name") == "PROPAGATE":
-            print("Receiving PROPAGATE after ACK")
             if robotInfo.get("G-ID") == message.get("G-ID"):
+                print("Waiting in aggregation")
                 # If the message received is PROPAGATE and the tag is joining, this robot will add the new robot to the group.
                 if message.get("R-ID") not in robotInfo.get("ID-List") and message.get("Tag") == "joining":
+                    print("Receiving PROPAGATE after ACK")
                     print("New robot is joining the group")
                     robotInfo.get(
                         "ID-List").append(message.get("R-ID"))
@@ -218,7 +221,7 @@ def readSensors():
         dsValues.append(robot.ds[i].getValue())
 
     for values in dsValues:
-        if values <= 100:
+        if values <= 50:
             detected = True
     return detected
 
@@ -228,7 +231,7 @@ def readSensors():
 def sendBroadcastMessage(MessageToSend):
     robot.emitter.setChannel(robot.emitter.CHANNEL_BROADCAST)
     jsonMessage = json.dumps(MessageToSend)
-    robot.emitter.setRange(101)
+    robot.emitter.setRange(51)
     robot.emitter.send(jsonMessage.encode())
     robot.emitter.setChannel(robotInfo.get("R-ID"))
     print("Sending broadcast:", MessageToSend)
@@ -239,7 +242,7 @@ def sendBroadcastMessage(MessageToSend):
 def sendP2PMessage(MessageToSend, channel):
     robot.emitter.setChannel(channel)
     jsonMessage = json.dumps(MessageToSend)
-    robot.emitter.setRange(101)
+    robot.emitter.setRange(51)
     robot.emitter.send(jsonMessage.encode())
     robot.emitter.setChannel(robotInfo.get("R-ID"))
     print("Sending P2P:", MessageToSend)

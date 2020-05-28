@@ -8,4 +8,4 @@ selectionDisabled: 0
 viewpointLocked: 0
 orthographicViewHeight: 1
 textFiles: -1
-globalOptionalRendering: DistanceSensorRays::RangeFinderFrustums
+globalOptionalRendering: RangeFinderFrustums::DistanceSensorRays

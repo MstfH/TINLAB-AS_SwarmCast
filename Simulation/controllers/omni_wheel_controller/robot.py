@@ -1,6 +1,7 @@
 from controller import Robot, LED, Emitter, Receiver
 
 # Here we are essentially just initializing the robot, its sensors and actuators
+SPEED_FACTOR = 3
 robot = Robot()
 timestep = int(robot.getBasicTimeStep())
 
@@ -34,5 +35,49 @@ dsNames = [
 for i in range(8):
     ds.append(robot.getDistanceSensor(dsNames[i]))
     ds[i].enable(timestep)
+
+
+def stop_wheels():
+    wheels[0].setVelocity(0)
+    wheels[1].setVelocity(0)
+    wheels[2].setVelocity(0)
+
+
+def move_north():
+    wheels[0].setVelocity(0)
+    wheels[1].setVelocity(-SPEED_FACTOR)
+    wheels[2].setVelocity(SPEED_FACTOR)
+
+
+def move_east():
+    wheels[0].setVelocity(-2 * SPEED_FACTOR)
+    wheels[1].setVelocity(SPEED_FACTOR)
+    wheels[2].setVelocity(SPEED_FACTOR)
+
+
+def move_south():
+    wheels[0].setVelocity(0)
+    wheels[1].setVelocity(SPEED_FACTOR)
+    wheels[2].setVelocity(-SPEED_FACTOR)
+
+
+def move_west():
+    wheels[0].setVelocity(2 * SPEED_FACTOR)
+    wheels[1].setVelocity(-SPEED_FACTOR)
+    wheels[2].setVelocity(-SPEED_FACTOR)
+
+
+def move(direction):
+    move_map = {
+        "I": stop_wheels,
+        "N": move_north,
+        "E": move_east,
+        "S": move_south,
+        "W": move_west,
+        "IF": stop_wheels
+    }
+    func = move_map.get(direction)
+    func()
+
 
 step = robot.step

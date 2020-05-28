@@ -16,9 +16,7 @@ def readSensors():
 
 while robot.step(robot.timestep) != -1:
 
-    s = readSensors()
-    print("Sensor values: ", s)
-
     aggregation.run()
+    print("Aggregation goal reached!")
 
     robot.led.set(random.randint(16, (int("0xffffff", 16))))
