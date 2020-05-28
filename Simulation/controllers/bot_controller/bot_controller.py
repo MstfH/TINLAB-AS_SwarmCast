@@ -3,6 +3,9 @@
 from controller import Supervisor
 import pickle
 import random
+import sys
+sys.path.append('..')
+from stateDefs import BotState as BotState
 
 SPEED_FACTOR = 3
 TIME_STEP = 32
@@ -61,19 +64,17 @@ def move_west():
     wheels[1].setVelocity(-SPEED_FACTOR)
     wheels[2].setVelocity(-SPEED_FACTOR)
 
-
 def move(direction):
     move_map = {
-        "I": stop_wheels,
-        "N": move_north,
-        "E": move_east,
-        "S": move_south,
-        "W": move_west,
-        "IF": stop_wheels
+        BotState.IDLE: stop_wheels,
+        BotState.TRAVELLING_NORTH: move_north,
+        BotState.TRAVELLING_EAST: move_east,
+        BotState.TRAVELLING_SOUTH: move_south,
+        BotState.TRAVELLING_WEST: move_west,
+        BotState.IN_FORMATION: stop_wheels
     }
     func = move_map.get(direction)
     func()
-
 
 while supervisor.step(TIME_STEP) != -1:
     while receiver.getQueueLength() > 0:

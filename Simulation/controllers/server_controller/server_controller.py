@@ -5,23 +5,10 @@ import pickle
 from math import sqrt
 import numpy as np
 from scipy.optimize import linear_sum_assignment
-from enum import Enum, auto
-
-
-class State(Enum):
-    WAITING_FOR_CONNECTIONS = auto()
-    CALCULATING_OPTIMAL_ASSIGNMENT = auto()
-    WAITING_FOR_FORMATION = auto()
-    ASSIGNING_COLORS = auto()
-    DONE = auto()
-
-
-IDLE = "I"
-TRAVELING_NORTH = "N"
-TRAVELING_EAST = "E"
-TRAVELING_SOUTH = "S"
-TRAVELING_WEST = "W"
-IN_FORMATION = "IF"
+import sys
+sys.path.append('..')
+from stateDefs import ServerState as ServerState
+from stateDefs import BotState as BotState
 
 TIME_STEP = 32
 POS_TOLERANCE = 0.05
@@ -42,7 +29,7 @@ for x in range(GRID_SIZE):
 GRID_POSITIONS = np.array(GRID_POSITIONS)
 print(GRID_POSITIONS)
 
-state = State.WAITING_FOR_CONNECTIONS
+state = ServerState.WAITING_FOR_CONNECTIONS
 current_shell = 0
 
 bots = []
@@ -78,8 +65,7 @@ def calculate_optimal_assignment():
             "target": GRID_POSITIONS[col_i],
             "shell": get_shell(GRID_POSITIONS[col_i])
         })
-
-    state = State.WAITING_FOR_FORMATION
+    state = ServerState.WAITING_FOR_FORMATION
 
 
 def send_message(message):
@@ -94,27 +80,27 @@ def get_state(bot):
     target_x, target_y = target
 
     if shell != current_shell:
-        return IDLE
+        return BotState.IDLE
 
     if pos_y - target_y > POS_TOLERANCE:
-        return TRAVELING_NORTH
+        return BotState.TRAVELLING_NORTH
 
     if target_x - pos_x > POS_TOLERANCE:
-        return TRAVELING_EAST
+        return BotState.TRAVELLING_EAST
 
     if target_y - pos_y > POS_TOLERANCE:
-        return TRAVELING_SOUTH
+        return BotState.TRAVELLING_SOUTH
 
     if pos_x - target_x > POS_TOLERANCE:
-        return TRAVELING_WEST
+        return BotState.TRAVELLING_WEST
 
-    return IN_FORMATION
+    return BotState.IN_FORMATION
 
 
 def current_shell_in_formation():
     bots_in_current_shell = [
         bot for bot in bots if bot.get("shell") == current_shell]
-    return all(bot.get("state") == IN_FORMATION for bot in bots_in_current_shell)
+    return all(bot.get("state") == BotState.IN_FORMATION for bot in bots_in_current_shell)
 
 
 if GRID_SIZE % 2 == 0:
@@ -138,27 +124,27 @@ while robot.step(TIME_STEP) != -1:
             })
 
         else:
-            # print(f"Registered bot {id} @ {position}")
+            print(f"Registered bot {id} @ {position}")
             bots.append({
                 "id": id,
                 "position": np.array(position),
                 "target": None,
-                "state": IDLE
+                "state": BotState.IDLE
             })
             bot_ids.append(id)
             bot = bots[-1]
 
         send_message(bot.get("state"))
 
-        if state == State.WAITING_FOR_CONNECTIONS and len(bots) == GRID_SIZE**2:
-            state = State.CALCULATING_OPTIMAL_ASSIGNMENT
+        if state == ServerState.WAITING_FOR_CONNECTIONS and len(bots) == GRID_SIZE**2:
+            state = ServerState.CALCULATING_OPTIMAL_ASSIGNMENT
             calculate_optimal_assignment()
 
         if current_shell_in_formation():
             if current_shell == MAX_SHELL:
-                state = State.ASSIGNING_COLORS
+                state = ServerState.ASSIGNING_COLORS
 
-            if state == State.WAITING_FOR_FORMATION:
+            if state == ServerState.WAITING_FOR_FORMATION:
                 current_shell += 1
 
         receiver.nextPacket()
