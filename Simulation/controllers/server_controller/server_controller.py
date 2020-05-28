@@ -1,6 +1,7 @@
 """sever_controller controller."""
 
 from controller import Robot
+import collisionDetection as cd
 import pickle
 from math import sqrt
 import numpy as np
@@ -34,7 +35,6 @@ current_shell = 0
 
 bots = []
 bot_ids = []
-collision_queue = []
 robot = Robot()
 emitter = robot.getEmitter("emitter")
 receiver = robot.getReceiver("receiver")
@@ -106,14 +106,15 @@ def current_shell_in_formation():
 if GRID_SIZE % 2 == 0:
     print("WARNING: Please set GRID_SIZE to an uneven number.")
 
-def collisionDetection(dsValues, proximityLimit = 100):
-    #returns distance sensor value when closer than proximityLimit
-    #or -1 if no collision is immenent
-    for i in dsValues:
-        if (i > 0 and i < proximityLimit):
-            return dsValues.index(i)
-    return -1
-    
+# #TODO delete after moving
+# def collisionDetection(dsValues, proximityLimit = 100):
+    # #returns distance sensor value when closer than proximityLimit
+    # #or -1 if no collision is immenent
+    # for i in dsValues:
+        # if (i > 0 and i < proximityLimit):
+            # return dsValues.index(i)
+    # return -1
+   
 while robot.step(TIME_STEP) != -1:
     if len(bots) > GRID_SIZE**2:
         print("WARNING: Excess of bots.")
@@ -130,7 +131,6 @@ while robot.step(TIME_STEP) != -1:
 
         if id in bot_ids:
             bot = next(bot for bot in bots if bot.get("id") == id)
-            print(id, dsValues)
             bot.update({
                 "position": position,
                 "dsValues": dsValues,
@@ -152,15 +152,16 @@ while robot.step(TIME_STEP) != -1:
             collisionAngle = collisionDetection(bot.get("dsValues"))
             if(collisionAngle != -1):
                 print("Proximity Warning bot:", id, "angle:", collisionAngle)
+
+            cd.scan(bot)
+
+            # print("a", bot)
+            if bot.get("state") == BRAKE_RELEASED:
                 bot.update({
-                    "state": IDLE,
-                    "collision": collisionAngle
+                    "state": bot.get("stateBeforeCollision"),
+                    "stateBeforeCollision": None
                 })
-                if collision_queue.count([bot.get("id"), bot.get("collision")]) == 0:
-                    collision_queue.append([bot.get("id"), bot.get("collision")])
-            #print(new_state, bot.get("id"))
-            #send_message(new_state)
-        
+                print("b", bot)
         else:
             print(f"Registered bot {id} @ {position}")
             bots.append({
@@ -169,11 +170,12 @@ while robot.step(TIME_STEP) != -1:
                 "target": None,
                 "state": BotState.IDLE,
                 "dsValues": None,
-                "collision": None
+                "collision": None,
+                "stateBeforeCollision": None
             })
             bot_ids.append(id)
             bot = bots[-1]
-        print("c",collision_queue)
+        
         send_message(bot.get("state"))
 
         if state == ServerState.WAITING_FOR_CONNECTIONS and len(bots) == GRID_SIZE**2:

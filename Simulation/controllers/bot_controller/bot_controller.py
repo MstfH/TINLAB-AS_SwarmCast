@@ -94,6 +94,7 @@ def move(direction):
         BotState.TRAVELLING_SOUTH: move_south,
         BotState.TRAVELLING_WEST: move_west,
         BotState.IN_FORMATION: stop_wheels
+        BotState.EMERGENCY_BRAKE: stop_wheels
     }
     func = move_map.get(direction)
     func()
