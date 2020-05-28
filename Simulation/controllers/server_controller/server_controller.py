@@ -59,15 +59,12 @@ def calculate_optimal_assignment():
             cost[i, j] = np.sum(np.absolute(
                 bots[i].get("position") - GRID_POSITIONS[j]))
 
-    np.set_printoptions(precision=2, suppress=True)
-    print(cost)
     rows, cols = linear_sum_assignment(cost)
     for (row_i, col_i) in zip(rows, cols):
         bots[row_i].update({
             "target": GRID_POSITIONS[col_i],
             "shell": get_shell(GRID_POSITIONS[col_i])
         })
-        print(bots[row_i])
     state = ServerState.WAITING_FOR_FORMATION
 
 

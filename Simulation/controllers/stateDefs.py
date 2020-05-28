@@ -1,16 +1,16 @@
-from enum import Enum, auto
+from enum import Enum
 
 class ServerState(Enum):
-    WAITING_FOR_CONNECTIONS = auto()
-    CALCULATING_OPTIMAL_ASSIGNMENT = auto()
-    WAITING_FOR_FORMATION = auto()
-    ASSIGNING_COLORS = auto()
-    DONE = auto()
+    WAITING_FOR_CONNECTIONS = 1
+    CALCULATING_OPTIMAL_ASSIGNMENT = 2
+    WAITING_FOR_FORMATION = 3
+    ASSIGNING_COLORS = 4
+    DONE = 0
 
 class BotState(Enum):
-    IDLE = auto()
-    TRAVELLING_NORTH = auto()
-    TRAVELLING_EAST = auto()
-    TRAVELLING_SOUTH = auto()
-    TRAVELLING_WEST = auto()
-    IN_FORMATION = auto()
+    IDLE = 'I'
+    TRAVELLING_NORTH = 'N'
+    TRAVELLING_EAST = 'E'
+    TRAVELLING_SOUTH = 'S'
+    TRAVELLING_WEST = 'W'
+    IN_FORMATION = 'IF'
