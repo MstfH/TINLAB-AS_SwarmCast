@@ -131,6 +131,7 @@ while robot.step(TIME_STEP) != -1:
 
         if id in bot_ids:
             bot = next(bot for bot in bots if bot.get("id") == id)
+            print(id, dsValues)
             bot.update({
                 "position": position,
                 "dsValues": dsValues,
