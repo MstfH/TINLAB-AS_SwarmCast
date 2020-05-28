@@ -79,7 +79,7 @@ def get_state(bot):
     pos_x, pos_y = position
     target_x, target_y = target
 
-    if shell != current_shell:
+    if shell > current_shell:
         return BotState.IDLE
 
     if pos_y - target_y > POS_TOLERANCE:
@@ -131,7 +131,6 @@ while robot.step(TIME_STEP) != -1:
 
         if id in bot_ids:
             bot = next(bot for bot in bots if bot.get("id") == id)
-            print(id, dsValues)
             bot.update({
                 "position": position,
                 "dsValues": dsValues,

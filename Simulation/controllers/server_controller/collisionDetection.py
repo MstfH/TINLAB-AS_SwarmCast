@@ -1,10 +1,16 @@
 from controller import Robot
 import numpy as np
 
+
+import sys
+sys.path.append('..')
+from stateDefs import ServerState as ServerState
+from stateDefs import BotState as BotState
+
+
 collision_queue = {}
 proximityLimit = 100
 
-BRAKE_RELEASED = "R"
 
 def parse(dsValues):
     '''
@@ -32,7 +38,7 @@ def scan(bot):
         #     "state": 'I',
         #     "collision": collisionAngles
         # })
-        if bot.get("state") == "IF":
+        if bot.get("state") == BotState.IN_FORMATION:
             print(ID, )
 
         bot.update({
