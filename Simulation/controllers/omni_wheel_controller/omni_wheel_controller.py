@@ -5,7 +5,8 @@ import random
 import robot
 import state_machine
 import jobs
-import lidarLogic as collision
+import threading
+import distanceSensorLogic as dSLogic
 
 
 def readSensors():
@@ -13,16 +14,22 @@ def readSensors():
     dsValues = []
     for i in range(8):
         dsValues.append(robot.ds[i].getValue())
-    #lidar.getRangeImage() for all layers
-    #lidar.getLayerRangeImage(3) for layer 3 of the n layers
-    #where layer 1 is the lowest and top layer the highest
-    collision.lidarPoint(robot.lidar.getRangeImage())
+    thread = threading.Thread(target=dSLogic.dSPoints(dsValues, state_machine.state))
+    thread.start()
     return dsValues
 
+def main():
+    while robot.step(robot.timestep) != -1:
+        readSensors()
+        
+        state_machine.state = state_machine.get_next_state()
+        state_machine.execute_state()
+        robot.led.set(random.randint(16, (int("0xffffff", 16))))
 
-while robot.step(robot.timestep) != -1:
-    readSensors()
-
-    state_machine.state = state_machine.get_next_state()
-    state_machine.execute_state()
-    robot.led.set(random.randint(16, (int("0xffffff", 16))))
+while True:
+    #this way it crashes every loop
+    try:
+        main()
+    except StopIteration:
+        print('good')
+        continue 

@@ -3,6 +3,7 @@ import math
 
 import robot
 import state_machine
+import time
 
 
 # Every job has its own unique enum to distinguish between them
@@ -11,6 +12,7 @@ import state_machine
 class Job(Enum):
     WAIT = auto()
     DRIVE_SQUARE = auto()
+    AVOID = auto()
 
 # Calculate the total acceleration in any non-vertical direction based on the Pythagoras theorem
 
@@ -63,10 +65,45 @@ def drive_square():
                     yield next(next_direction_generator)
                     break
 
+movementDirection = 'd'
+def avoid():
+    while True:
+            if movementDirection == 'west':
+                #code crashes at this line
+                yield state_machine.State.TRAVELING_WEST
+                if -0.05 < get_total_acceleration() < 0.05:
+                    yield next(next_direction_generator)
+                    break
+                time.sleep(0.2)
+                #After crash it finishes everything that comes after this
+                break
+            if movementDirection == 'east':
+                yield state_machine.State.TRAVELING_EAST
+                if -0.05 < get_total_acceleration() < 0.05:
+                    yield next(next_direction_generator)
+                    break
+                time.sleep(0.2)
+                break
+            if movementDirection == 'north':
+                yield state_machine.State.TRAVELING_NORTH
+                if -0.05 < get_total_acceleration() < 0.05:
+                    yield next(next_direction_generator)
+                    break
+                time.sleep(0.2)
+                break
+            if movementDirection == 'south':
+                yield state_machine.State.TRAVELING_SOUTH
+                if -0.05 < get_total_acceleration() < 0.05:
+                    yield next(next_direction_generator)
+                    break
+                time.sleep(0.2)
+                break
+        
 
 job_map = {
     Job.WAIT: wait,
-    Job.DRIVE_SQUARE: drive_square
+    Job.DRIVE_SQUARE: drive_square,
+    Job.AVOID: avoid
 }
 
 

@@ -5,25 +5,25 @@ WorldInfo {
   ]
   title "Omni-wheels"
   basicTimeStep 8
+  FPS 30
 }
 Viewpoint {
-  orientation 0.31171677535583414 0.9018207441213779 0.2992523975411472 4.6498978307177055
-  position -2.8317083024669065 2.0912279472120243 0.016458406524991753
+  orientation 0.9986470889177014 -0.03796709258736634 -0.035531558883093055 4.777288063094773
+  position 1.2883276824400978 8.871030151947545 0.7239959544503439
 }
 TexturedBackground {
+  skybox FALSE
+  reflections FALSE
 }
 TexturedBackgroundLight {
+  castShadows FALSE
 }
 RectangleArena {
   floorSize 5 5
 }
 DEF OMNI_WHEELS Robot {
-  translation 0 0.06 0
+  translation 0 0.06 -0.01
   children [
-    VelodynePuck {
-      translation 0 0.14 0
-      version "Puck LITE"
-    }
     DEF SKIRT Transform {
       children [
         DEF SUPPORT Solid {
@@ -101,8 +101,8 @@ DEF OMNI_WHEELS Robot {
             }
           ]
           endPoint Solid {
-            translation 0 0 0.1
-            rotation 0 0 1 0
+            translation 4.958689602696332e-07 3.5933134613853106e-06 0.1000012560103227
+            rotation -0.01908052213222008 0.012375678665492348 0.9997413546776638 3.7507143305821637e-06
             children [
               DEF sr1 HingeJoint {
                 jointParameters HingeJointParameters {
@@ -364,8 +364,8 @@ DEF OMNI_WHEELS Robot {
             }
           ]
           endPoint Solid {
-            translation 0 0 0.1
-            rotation 0 0 1 0.00240580999995935
+            translation 1.6470257048088704e-06 1.5310199786867858e-06 0.10000119487634684
+            rotation 0.024412168109117942 0.0035180377366292813 -0.9996957884570165 6.2800985316295765
             children [
               DEF sr1 HingeJoint {
                 jointParameters HingeJointParameters {
@@ -541,7 +541,7 @@ DEF OMNI_WHEELS Robot {
           }
         }
       ]
-      name "wheel2"
+      name "wheel2(1)"
       boundingObject USE DUMMY
       physics Physics {
       }
@@ -560,8 +560,8 @@ DEF OMNI_WHEELS Robot {
             }
           ]
           endPoint Solid {
-            translation 0 0 0.1
-            rotation 0 0 1 0.0039094400000208316
+            translation -1.1053053042006032e-06 3.940292884802042e-06 0.10000227940805079
+            rotation -0.026984660953070425 0.007404571048189972 -0.9996084235343559 6.279949774752469
             children [
               DEF sr1 HingeJoint {
                 jointParameters HingeJointParameters {
@@ -760,7 +760,7 @@ DEF OMNI_WHEELS Robot {
       ]
     }
     LED {
-      translation 0 0.18 0
+      translation 0 0.11 0
       children [
         Group {
           children [
@@ -776,7 +776,7 @@ DEF OMNI_WHEELS Robot {
             }
             PointLight {
               attenuation 0 0 1
-              color 0.43921568989753723 0.7529411911964417 0.5137255191802979
+              color 0.6666666865348816 0.9764705896377563 0.6313725709915161
               intensity 0.5
               location 0 0.03 0
               on FALSE
@@ -817,7 +817,6 @@ DEF OMNI_WHEELS Robot {
             0 0 0
             1 1000 0
           ]
-          numberOfRays 2
           aperture 1
         }
         DistanceSensor {
@@ -846,7 +845,6 @@ DEF OMNI_WHEELS Robot {
             0 0 0
             1 1000 0
           ]
-          numberOfRays 2
           aperture 1
         }
         DistanceSensor {
@@ -875,7 +873,6 @@ DEF OMNI_WHEELS Robot {
             0 0 0
             1 1000 0
           ]
-          numberOfRays 2
           aperture 1
         }
         DistanceSensor {
@@ -904,7 +901,6 @@ DEF OMNI_WHEELS Robot {
             0 0 0
             1 1000 0
           ]
-          numberOfRays 2
           aperture 1
         }
         DistanceSensor {
@@ -933,7 +929,6 @@ DEF OMNI_WHEELS Robot {
             0 0 0
             1 1000 0
           ]
-          numberOfRays 2
           aperture 1
         }
         DistanceSensor {
@@ -962,7 +957,6 @@ DEF OMNI_WHEELS Robot {
             0 0 0
             1 1000 0
           ]
-          numberOfRays 2
           aperture 1
         }
         DistanceSensor {
@@ -991,7 +985,6 @@ DEF OMNI_WHEELS Robot {
             0 0 0
             1 1000 0
           ]
-          numberOfRays 2
           aperture 1
         }
         DistanceSensor {
@@ -1020,13 +1013,18 @@ DEF OMNI_WHEELS Robot {
             0 0 0
             1 1000 0
           ]
-          numberOfRays 2
           aperture 1
         }
       ]
     }
   ]
+  name "robot(3)"
+  boundingObject Cylinder {
+    height 0.1
+    radius 0.05
+  }
   physics Physics {
+    mass 1
   }
   controller "omni_wheel_controller"
 }
@@ -1038,7 +1036,7 @@ SolidBox {
   }
 }
 SolidBox {
-  translation 1.21269 0.2377375001039332 -1.15256
+  translation -0.00731 0.237738 -0.65256
   rotation -0.3520310156358334 0.318649790868044 -0.8800775390896846 2.232199401272946e-18
   name "box(1)"
   size 0.5 0.5 0.5

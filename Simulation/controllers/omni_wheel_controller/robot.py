@@ -1,12 +1,8 @@
-from controller import Robot, LED, Lidar
+from controller import Robot, LED
 
 # Here we are essentially just initializing the robot, its sensors and actuators
 robot = Robot()
 timestep = int(robot.getBasicTimeStep())
-
-lidar = robot.getLidar("Velodyne Puck")
-lidar.enable(timestep)
-lidar.enablePointCloud()
 
 led = robot.getLED("led")
 
