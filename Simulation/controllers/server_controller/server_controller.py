@@ -106,6 +106,14 @@ def get_state(bot):
     pos_x, pos_y = position
     target_x, target_y = target
 
+    close_bots = [_bot for _bot in bots
+                  if id != _bot.get("id")
+                  and distance_between(position, _bot.get("position")) < 0.4]
+
+    for other_bot in close_bots:
+        if not bot.get("swapped") and not other_bot.get("swapped"):
+            swap(bot, other_bot)
+
     if shell > current_shell:
         return BotState.IDLE
 

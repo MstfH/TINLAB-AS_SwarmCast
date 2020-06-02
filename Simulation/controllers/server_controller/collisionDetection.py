@@ -76,13 +76,15 @@ def scan(bot):
 
             collision_queue.update({ID : collisionAngles})
 
-            if max(collision_queue, key=int) == ID:
-                print(ID, "higher priority, avoiding")
-                avoidCollision(bot, collisionAngles)
-                bot.update({
-                            "stateBeforeCollision": None,
-                            "collision": None
-                })
+            avoidCollision(bot, collisionAngles)
+
+            # if max(collision_queue, key=int) == ID:
+            #     print(ID, "higher priority, avoiding")
+            #     avoidCollision(bot, collisionAngles)
+            #     bot.update({
+            #                 "stateBeforeCollision": None,
+            #                 "collision": None
+            #     })
 
         
         # if len(collision_queue) > 1:
