@@ -8,13 +8,13 @@ import numpy as np
 from scipy.optimize import linear_sum_assignment
 import sys
 sys.path.append('..')
-from stateDefs import ServerState as ServerState
 from stateDefs import BotState as BotState
+from stateDefs import ServerState as ServerState
 
 TIME_STEP = 32
 POS_TOLERANCE = 0.05
 GRID_SIZE = 3
-GRID_ORIGIN = -1
+GRID_ORIGIN = 0.5
 GRID_SPACING = 0.5
 MAX_SHELL = (GRID_SIZE - 1) / 2
 GRID_POSITIONS = []
@@ -30,7 +30,7 @@ for x in range(GRID_SIZE):
 GRID_POSITIONS = np.array(GRID_POSITIONS)
 print(GRID_POSITIONS)
 
-state = ServerState.WAITING_FOR_CONNECTIONS
+server_state = ServerState.WAITING_FOR_CONNECTIONS
 current_shell = 0
 
 bots = []
@@ -39,6 +39,12 @@ robot = Robot()
 emitter = robot.getEmitter("emitter")
 receiver = robot.getReceiver("receiver")
 receiver.enable(TIME_STEP)
+
+
+def distance_between(p1, p2):
+    x1, y1 = p1
+    x2, y2 = p2
+    return sqrt((x1 - x2)**2 + (y1 - y2)**2)
 
 
 def get_shell(point):
@@ -52,7 +58,7 @@ def get_shell(point):
 
 
 def calculate_optimal_assignment():
-    global state
+    global server_state
     cost = np.empty([len(bots), len(bots)])
     for i in range(len(bots)):
         for j in range(len(bots)):
@@ -65,14 +71,35 @@ def calculate_optimal_assignment():
             "target": GRID_POSITIONS[col_i],
             "shell": get_shell(GRID_POSITIONS[col_i])
         })
-    state = ServerState.WAITING_FOR_FORMATION
+    server_state = ServerState.WAITING_FOR_FORMATION
 
 
 def send_message(message):
     emitter.send(pickle.dumps(message))
 
 
+def swap(bot1, bot2):
+    target = bot1.get("target")
+    state = bot1.get("state")
+    shell = bot1.get("shell")
+
+    bot1.update({
+        "target": bot2.get("target"),
+        "state": bot2.get("state"),
+        "shell": bot2.get("shell"),
+        "swapped": True
+    })
+
+    bot2.update({
+        "target": target,
+        "state": state,
+        "shell": shell,
+        "swapped": True
+    })
+
+
 def get_state(bot):
+    id = bot.get("id")
     position = bot.get("position")
     target = bot.get("target")
     shell = bot.get("shell")
@@ -161,15 +188,15 @@ while robot.step(TIME_STEP) != -1:
         
         send_message(bot.get("state"))
 
-        if state == ServerState.WAITING_FOR_CONNECTIONS and len(bots) == GRID_SIZE**2:
-            state = ServerState.CALCULATING_OPTIMAL_ASSIGNMENT
+        if server_state == ServerState.WAITING_FOR_CONNECTIONS and len(bots) == GRID_SIZE**2:
+            server_state = ServerState.CALCULATING_OPTIMAL_ASSIGNMENT
             calculate_optimal_assignment()
 
         if current_shell_in_formation():
             if current_shell == MAX_SHELL:
-                state = ServerState.ASSIGNING_COLORS
+                server_state = ServerState.ASSIGNING_COLORS
 
-            if state == ServerState.WAITING_FOR_FORMATION:
+            if server_state == ServerState.WAITING_FOR_FORMATION:
                 current_shell += 1
 
         receiver.nextPacket()
