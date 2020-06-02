@@ -13,7 +13,7 @@ from stateDefs import ServerState as ServerState
 
 TIME_STEP = 32
 POS_TOLERANCE = 0.05
-GRID_SIZE = 3
+GRID_SIZE = 5
 GRID_ORIGIN = 0.5
 GRID_SPACING = 0.5
 MAX_SHELL = (GRID_SIZE - 1) / 2
@@ -59,6 +59,7 @@ def get_shell(point):
 
 def calculate_optimal_assignment():
     global server_state
+    lengthOfBots=len(bots)
     cost = np.empty([len(bots), len(bots)])
     for i in range(len(bots)):
         for j in range(len(bots)):
@@ -162,24 +163,9 @@ while robot.step(TIME_STEP) != -1:
                 "dsValues": dsValues,
                 "state": get_state(bot)
             })
-            #TODO check from rebase
-            # bot.update({"position": position})
-            # new_state = get_state(
-            #     bot.get("position"), bot.get("target")
-            # )
 
-            cd.scan(bot)
+            #cd.scan(bot)
 
-            #if id in cd.collision_queue:
-
-
-            # print("a", bot)
-            # if bot.get("state") == BRAKE_RELEASED:
-            #     bot.update({
-            #         "state": bot.get("stateBeforeCollision"),
-            #         "stateBeforeCollision": None
-            #     })
-            #     print("b", bot)
         else:
             print(f"Registered bot {id} @ {position}")
             bots.append({
@@ -194,7 +180,8 @@ while robot.step(TIME_STEP) != -1:
             bot_ids.append(id)
             bot = bots[-1]
         
-        send_message(bot.get("state"))
+        print(id, send_message(bot.get("state")))
+        #send_message(bot.get("state"))
 
         if server_state == ServerState.WAITING_FOR_CONNECTIONS and len(bots) == GRID_SIZE**2:
             server_state = ServerState.CALCULATING_OPTIMAL_ASSIGNMENT

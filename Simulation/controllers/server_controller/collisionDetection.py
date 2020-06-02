@@ -65,6 +65,9 @@ def scan(bot):
         if bot.get('state') == BotState.IN_FORMATION:
             print(ID, 'in formation. Ignoring collision')
             if ID in collision_queue:
+                bot.update({
+                    "state": BotState.IDLE
+                })
                 collision_queue.pop(ID)
         else:
             print("Proximity Warning bot:", ID, collisionAngles)

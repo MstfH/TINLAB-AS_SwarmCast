@@ -8,7 +8,7 @@ WorldInfo {
 }
 Viewpoint {
   orientation 1 0 0 4.71238898038469
-  position 0.05006176886881136 6.396887463350325 -0.04999985227026408
+  position 1.8590298575244946 16.121938755179787 1.406842023937942
 }
 TexturedBackground {
 }
@@ -25,7 +25,7 @@ DEF SERVER Robot {
     Receiver {
     }
     Emitter {
-      channel 1134
+      channel 4914
     }
   ]
   name "robot(1)"
@@ -57,4 +57,52 @@ OmniBot {
 }
 OmniBot {
   translation 1.76 0.06 0.7
+}
+OmniBot {
+  translation 0.583764 0.06 -0.00279347
+}
+OmniBot {
+  translation 0.076523 0.06 0.930877
+}
+OmniBot {
+  translation 0.835225 0.06 1.06175
+}
+OmniBot {
+  translation 2.16 0.06 1.0999999999999999
+}
+OmniBot {
+  translation 1.29253 0.06 0.314869
+}
+OmniBot {
+  translation 2.04094 0.06 0.147271
+}
+OmniBot {
+  translation 2.16153 0.06 1.97636
+}
+OmniBot {
+  translation 1.58767 0.06 2.10845
+}
+OmniBot {
+  translation -0.00234261 0.06 0.336604
+}
+OmniBot {
+  translation -0.832917 0.06 0.0729312
+}
+OmniBot {
+  translation 0.101391 0.06 -0.447452
+}
+OmniBot {
+  translation 1.39937 0.06 0.914707
+}
+OmniBot {
+  translation 0.440442 0.06 1.38908
+}
+OmniBot {
+  translation -0.785893 0.06 1.56395
+}
+OmniBot {
+  translation -0.183169 0.06 1.98484
+}
+OmniBot {
+  translation 2.25931 0.06 0.61945
 }

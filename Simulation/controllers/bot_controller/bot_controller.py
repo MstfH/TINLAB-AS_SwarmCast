@@ -103,7 +103,12 @@ while supervisor.step(TIME_STEP) != -1:
     while receiver.getQueueLength() > 0:
         raw_data = receiver.getData()
         direction = pickle.loads(raw_data)
-        move(direction)
+        try:
+            move(direction)
+        except:
+            print(ID, "can't move to", direction)
+        finally:
+            move(BotState.IDLE)
         receiver.nextPacket()
     dsValues = readSensors()
     current_position = translation_field.getSFVec3f()
