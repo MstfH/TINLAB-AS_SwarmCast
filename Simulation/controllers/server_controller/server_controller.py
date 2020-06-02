@@ -162,15 +162,14 @@ while robot.step(TIME_STEP) != -1:
 
         receiver.nextPacket()
 
+    if server_state == ServerState.WAITING_FOR_CONNECTIONS and len(bots) == GRID_SIZE**2:
+        server_state = ServerState.CALCULATING_OPTIMAL_ASSIGNMENT
+        calculate_optimal_assignment()
 
-        if server_state == ServerState.WAITING_FOR_CONNECTIONS and len(bots) == GRID_SIZE**2:
-            server_state = ServerState.CALCULATING_OPTIMAL_ASSIGNMENT
-            calculate_optimal_assignment()
+    if current_shell_in_formation():
+        if current_shell == MAX_SHELL:
+            server_state = ServerState.ASSIGNING_COLORS
 
-        if current_shell_in_formation():
-            if current_shell == MAX_SHELL:
-                server_state = ServerState.ASSIGNING_COLORS
-
-            if server_state == ServerState.WAITING_FOR_FORMATION:
-                current_shell += 1
+        if server_state == ServerState.WAITING_FOR_FORMATION:
+            current_shell += 1
 
