@@ -6,6 +6,8 @@ from math import sqrt
 import numpy as np
 from scipy.optimize import linear_sum_assignment
 import sys
+
+from Bot import Bot
 sys.path.append('..')
 from stateDefs import ServerState as ServerState
 from stateDefs import BotState as BotState
@@ -33,14 +35,13 @@ state = ServerState.WAITING_FOR_CONNECTIONS
 current_shell = 0
 
 bots = []
-bot_ids = []
 
 robot = Robot()
 emitter = robot.getEmitter("emitter")
 receiver = robot.getReceiver("receiver")
 receiver.enable(100)
 
-
+# Determine how many steps a given point on the grid is removed from its center
 def get_shell(point):
     x, y = point
     center = GRID_ORIGIN + (GRID_SIZE - 1) / 2 * GRID_SPACING
@@ -50,36 +51,35 @@ def get_shell(point):
     steps = max_delta / GRID_SPACING
     return steps
 
-
+# Determine what the optimal assignment for assigning bots to positions on the grid is,
+# So that the total cummulative distance traveled is minimal
+# For this, we use the Hungarian method provided by scipy through linear_sum_assignment
 def calculate_optimal_assignment():
     global state
     cost = np.empty([len(bots), len(bots)])
     for i in range(len(bots)):
         for j in range(len(bots)):
-            cost[i, j] = np.sum(np.absolute(
-                bots[i].get("position") - GRID_POSITIONS[j]))
+            cost[i, j] = np.sum(np.absolute(bots[i].position - GRID_POSITIONS[j]))
 
     rows, cols = linear_sum_assignment(cost)
     for (row_i, col_i) in zip(rows, cols):
-        bots[row_i].update({
-            "target": GRID_POSITIONS[col_i],
-            "shell": get_shell(GRID_POSITIONS[col_i])
-        })
+        bot = bots[row_i]
+        target = GRID_POSITIONS[col_i]
+        bot.set_target(target)
+        bot.set_shell(get_shell(target))
+    
     state = ServerState.WAITING_FOR_FORMATION
 
 
 def send_message(message):
     emitter.send(pickle.dumps(message))
 
-
+# Determine the next state for a bot, based on its own and other bot's properties
 def get_state(bot):
-    position = bot.get("position")
-    target = bot.get("target")
-    shell = bot.get("shell")
-    pos_x, pos_y = position
-    target_x, target_y = target
+    pos_x, pos_y = bot.position
+    target_x, target_y = bot.target
 
-    if shell != current_shell:
+    if bot.shell != current_shell:
         return BotState.IDLE
 
     if pos_y - target_y > POS_TOLERANCE:
@@ -96,55 +96,47 @@ def get_state(bot):
 
     return BotState.IN_FORMATION
 
-
+# Determine whether all bots that belong to the current shell are currently in formation
 def current_shell_in_formation():
-    bots_in_current_shell = [
-        bot for bot in bots if bot.get("shell") == current_shell]
-    return all(bot.get("state") == BotState.IN_FORMATION for bot in bots_in_current_shell)
+    bots_in_current_shell = [bot for bot in bots if bot.shell == current_shell]
+    return all(bot.state == BotState.IN_FORMATION for bot in bots_in_current_shell)
 
 
 if GRID_SIZE % 2 == 0:
-    print("WARNING: Please set GRID_SIZE to an uneven number.")
+    raise Exception("GRID_SIZE should be set to be an even number.")
 
 while robot.step(TIME_STEP) != -1:
     if len(bots) > GRID_SIZE**2:
-        print("WARNING: Excess of bots.")
+        raise Exception("Too many bots.")
 
     while receiver.getQueueLength() > 0:
         bot = None
         raw_data = receiver.getData()
         (id, position) = pickle.loads(raw_data)
         emitter.setChannel(id)
-
-        if id in bot_ids:
-            bot = next(bot for bot in bots if bot.get("id") == id)
-            bot.update({
-                "position": position,
-                "state": get_state(bot)
-            })
+            
+        if id in [bot.id for bot in bots]:
+            if state != ServerState.WAITING_FOR_CONNECTIONS:
+                bot = next(bot for bot in bots if bot.id == id)
+                bot.set_position(np.array(position))
+                bot.set_state(get_state(bot))
+                send_message(bot.state)
 
         else:
-            print(f"Registered bot {id} @ {position}")
-            bots.append({
-                "id": id,
-                "position": np.array(position),
-                "target": None,
-                "state": BotState.IDLE
-            })
-            bot_ids.append(id)
-            bot = bots[-1]
-
-        send_message(bot.get("state"))
-
-        if state == ServerState.WAITING_FOR_CONNECTIONS and len(bots) == GRID_SIZE**2:
-            state = ServerState.CALCULATING_OPTIMAL_ASSIGNMENT
-            calculate_optimal_assignment()
-
-        if current_shell_in_formation():
-            if current_shell == MAX_SHELL:
-                state = ServerState.ASSIGNING_COLORS
-
-            if state == ServerState.WAITING_FOR_FORMATION:
-                current_shell += 1
+            bot = Bot(id=id, position=np.array(position))
+            bots.append(bot)
 
         receiver.nextPacket()
+
+
+    if state == ServerState.WAITING_FOR_CONNECTIONS and len(bots) == GRID_SIZE**2:
+        state = ServerState.CALCULATING_OPTIMAL_ASSIGNMENT
+        calculate_optimal_assignment()
+
+    if current_shell_in_formation():
+        if current_shell == MAX_SHELL:
+            state = ServerState.ASSIGNING_COLORS
+
+        if state == ServerState.WAITING_FOR_FORMATION:
+            current_shell += 1
+

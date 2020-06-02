@@ -28,7 +28,7 @@ DEF SERVER Robot {
       channel 1134
     }
   ]
-  name "robot(1)"
+  name "server"
   controller "server_controller"
 }
 OmniBot {
