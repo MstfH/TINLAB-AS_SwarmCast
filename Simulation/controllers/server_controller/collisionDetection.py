@@ -11,6 +11,34 @@ from stateDefs import BotState as BotState
 collision_queue = {}
 proximityLimit = 100
 
+#sensorKey=[BotState.TRAVELLING_EAST,5,6,7,0,1,2,3]
+movementKey={
+    #sensor(s) : direction when tripped
+    tuple([0]) :       BotState.TRAVELLING_WEST,
+    tuple([0, 1]) :    BotState.TRAVELLING_WEST,
+    tuple([1]) :       BotState.TRAVELLING_WEST,
+    tuple([1, 2]) :    BotState.TRAVELLING_SOUTH,
+    tuple([2]) :       BotState.TRAVELLING_NORTH,
+    tuple([2, 3]) :    BotState.TRAVELLING_NORTH,
+    tuple([3]) :       BotState.TRAVELLING_NORTH,
+    tuple([3, 4]) :    BotState.TRAVELLING_WEST,
+    tuple([4]) :       BotState.TRAVELLING_EAST,
+    tuple([4, 5]) :    BotState.TRAVELLING_EAST,
+    tuple([5]) :       BotState.TRAVELLING_EAST,
+    tuple([5, 6]) :    BotState.TRAVELLING_EAST,
+    tuple([6]) :       BotState.TRAVELLING_SOUTH,
+    tuple([6, 7]) :    BotState.TRAVELLING_SOUTH,
+    tuple([7]) :       BotState.TRAVELLING_SOUTH,
+    tuple([7, 0]) :    BotState.TRAVELLING_EAST
+}
+
+def avoidCollision(bot, collisionAngles):
+    #collisionAngles=repr(collisionAngles)
+    movement = movementKey.get(collisionAngles)
+    bot.update({
+        "state": movement
+    })
+    print(bot)
 
 def parse(dsValues):
     '''
@@ -32,32 +60,37 @@ def scan(bot):
     collisionAngles = parse(bot.get("dsValues"))
     ID = bot.get("id")
     if(np.size(collisionAngles) > 0):
-        collisionAngles=list(collisionAngles)
-        print("Proximity Warning bot:", ID, collisionAngles)
-        # bot.update({
-        #     "state": 'I',
-        #     "collision": collisionAngles
-        # })
-        if bot.get("state") == BotState.IN_FORMATION:
-            print(ID, )
+        collisionAngles=tuple(collisionAngles)
 
-        bot.update({
-            "stateBeforeCollision": bot.get("state"),
-            "state": BotState.EMERGENCY_BRAKE,
-            "collision": collisionAngles
-        })
+        if bot.get('state') == BotState.IN_FORMATION:
+            print(ID, 'in formation. Ignoring collision')
+            if ID in collision_queue:
+                collision_queue.pop(ID)
+        else:
+            print("Proximity Warning bot:", ID, collisionAngles)
+            bot.update({
+                "stateBeforeCollision": bot.get("state"),
+                "state": BotState.EMERGENCY_BRAKE,
+                "collision": collisionAngles
+            })
 
-        if ID not in collision_queue:
             collision_queue.update({ID : collisionAngles})
-        elif ID in collision_queue: #updates if another sensor trips
-            collision_queue.update({ID : collisionAngles})
-        
-        if len(collision_queue) > 1:
-            if (max(collision_queue, key=int) == ID):
-                print(ID, "higher priority, continuing")
+
+            if max(collision_queue, key=int) == ID:
+                print(ID, "higher priority, avoiding")
+                avoidCollision(bot, collisionAngles)
                 bot.update({
-                    "state": BotState.BRAKE_RELEASED,
-                    "collision": None
+                            "stateBeforeCollision": None,
+                            "collision": None
                 })
-                collision_queue.pop(max(collision_queue))
+
+        
+        # if len(collision_queue) > 1:
+        #     if (max(collision_queue, key=int) == ID):
+        #         print(ID, "higher priority, continuing")
+        #         bot.update({
+        #             "state": BotState.BRAKE_RELEASED,
+        #             "collision": None
+        #         })
+        #         collision_queue.pop(max(collision_queue))
     return

@@ -105,15 +105,6 @@ def current_shell_in_formation():
 
 if GRID_SIZE % 2 == 0:
     print("WARNING: Please set GRID_SIZE to an uneven number.")
-
-# #TODO delete after moving
-# def collisionDetection(dsValues, proximityLimit = 100):
-    # #returns distance sensor value when closer than proximityLimit
-    # #or -1 if no collision is immenent
-    # for i in dsValues:
-        # if (i > 0 and i < proximityLimit):
-            # return dsValues.index(i)
-    # return -1
    
 while robot.step(TIME_STEP) != -1:
     if len(bots) > GRID_SIZE**2:
@@ -141,27 +132,19 @@ while robot.step(TIME_STEP) != -1:
             # new_state = get_state(
             #     bot.get("position"), bot.get("target")
             # )
-            #TODO check from rebase
-            if((collisionDetection(dsValues)) > 0):
-                print("Proximity Warning bot: ", bot.get("id"))
-                collision_queue.append({bot.get("id")})
-                new_state = IDLE
-            print(new_state, bot.get("id"))
-            send_message(new_state)
-            ##
-            collisionAngle = collisionDetection(bot.get("dsValues"))
-            if(collisionAngle != -1):
-                print("Proximity Warning bot:", id, "angle:", collisionAngle)
 
             cd.scan(bot)
 
+            #if id in cd.collision_queue:
+
+
             # print("a", bot)
-            if bot.get("state") == BRAKE_RELEASED:
-                bot.update({
-                    "state": bot.get("stateBeforeCollision"),
-                    "stateBeforeCollision": None
-                })
-                print("b", bot)
+            # if bot.get("state") == BRAKE_RELEASED:
+            #     bot.update({
+            #         "state": bot.get("stateBeforeCollision"),
+            #         "stateBeforeCollision": None
+            #     })
+            #     print("b", bot)
         else:
             print(f"Registered bot {id} @ {position}")
             bots.append({
