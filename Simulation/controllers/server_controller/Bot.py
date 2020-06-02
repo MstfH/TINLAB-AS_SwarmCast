@@ -12,6 +12,7 @@ class Bot:
         self.position = position
         self.target = None
         self.shell = None
+        self.swapped_with = []
         self.state = BotState.IDLE
 
     def set_position(self, position):
@@ -22,6 +23,9 @@ class Bot:
 
     def set_shell(self, shell):
         self.shell = shell
+
+    def append_swapped(self, bot):
+        self.swapped_with.append(bot)
 
     def set_state(self, state):
         self.state = state
