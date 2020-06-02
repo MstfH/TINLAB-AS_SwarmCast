@@ -7,6 +7,8 @@ from math import sqrt
 import numpy as np
 from scipy.optimize import linear_sum_assignment
 import sys
+
+from Bot import Bot
 sys.path.append('..')
 from stateDefs import BotState as BotState
 from stateDefs import ServerState as ServerState
@@ -34,7 +36,6 @@ server_state = ServerState.WAITING_FOR_CONNECTIONS
 current_shell = 0
 
 bots = []
-bot_ids = []
 robot = Robot()
 emitter = robot.getEmitter("emitter")
 receiver = robot.getReceiver("receiver")
@@ -46,7 +47,13 @@ def distance_between(p1, p2):
     x2, y2 = p2
     return sqrt((x1 - x2)**2 + (y1 - y2)**2)
 
+# Simple pythagorean distance between 2 points
+def distance_between(p1, p2):
+    x1, y1 = p1
+    x2, y2 = p2
+    return sqrt((x1 - x2)**2 + (y1 - y2)**2)
 
+# Determine how many steps a given point on the grid is removed from its center
 def get_shell(point):
     x, y = point
     center = GRID_ORIGIN + (GRID_SIZE - 1) / 2 * GRID_SPACING
@@ -56,65 +63,63 @@ def get_shell(point):
     steps = max_delta / GRID_SPACING
     return steps
 
-
+# Determine what the optimal assignment for assigning bots to positions on the grid is,
+# So that the total cummulative distance traveled is minimal
+# For this, we use the Hungarian method provided by scipy through linear_sum_assignment
 def calculate_optimal_assignment():
     global server_state
     cost = np.empty([len(bots), len(bots)])
     for i in range(len(bots)):
         for j in range(len(bots)):
-            cost[i, j] = np.sum(np.absolute(
-                bots[i].get("position") - GRID_POSITIONS[j]))
+            cost[i, j] = np.sum(np.absolute(bots[i].position - GRID_POSITIONS[j]))
 
     rows, cols = linear_sum_assignment(cost)
     for (row_i, col_i) in zip(rows, cols):
-        bots[row_i].update({
-            "target": GRID_POSITIONS[col_i],
-            "shell": get_shell(GRID_POSITIONS[col_i])
-        })
+        bot = bots[row_i]
+        target = GRID_POSITIONS[col_i]
+        bot.set_target(target)
+        bot.set_shell(get_shell(target))
+    
     server_state = ServerState.WAITING_FOR_FORMATION
 
 
 def send_message(message):
     emitter.send(pickle.dumps(message))
 
+# Determine whether 2 bots have swapped in the past
+def have_swapped(b1, b2):
+    return b2 in b1.swapped_with or b1 in b2.swapped_with
 
-def swap(bot1, bot2):
-    target = bot1.get("target")
-    state = bot1.get("state")
-    shell = bot1.get("shell")
+# Swap the target, state and shell properties of 2 bots
+def swap(b1, b2):
+    target = b1.target
+    state = b1.state
+    shell = b1.shell
 
-    bot1.update({
-        "target": bot2.get("target"),
-        "state": bot2.get("state"),
-        "shell": bot2.get("shell"),
-        "swapped": True
-    })
+    b1.set_target(b2.target)
+    b1.set_state(b2.state)
+    b1.set_shell(b2.shell)
+    b1.append_swapped(b2)
+    
+    b2.set_target(target)
+    b2.set_state(state)
+    b2.set_shell(shell)
+    b2.append_swapped(b1)
 
-    bot2.update({
-        "target": target,
-        "state": state,
-        "shell": shell,
-        "swapped": True
-    })
-
-
+# Determine the next state for a bot, based on its own and other bot's properties
 def get_state(bot):
-    id = bot.get("id")
-    position = bot.get("position")
-    target = bot.get("target")
-    shell = bot.get("shell")
-    pos_x, pos_y = position
-    target_x, target_y = target
+    pos_x, pos_y = bot.position
+    target_x, target_y = bot.target
 
-    close_bots = [_bot for _bot in bots
-                  if id != _bot.get("id")
-                  and distance_between(position, _bot.get("position")) < 0.4]
+    close_bots = [other_bot for other_bot in bots
+                  if bot.id != other_bot.id
+                  and distance_between(bot.position, other_bot.position) < 0.4]
 
     for other_bot in close_bots:
-        if not bot.get("swapped") and not other_bot.get("swapped"):
+        if not have_swapped(bot, other_bot):
             swap(bot, other_bot)
 
-    if shell > current_shell:
+    if bot.shell > current_shell:
         return BotState.IDLE
 
     if pos_y - target_y > POS_TOLERANCE:
@@ -131,19 +136,18 @@ def get_state(bot):
 
     return BotState.IN_FORMATION
 
-
+# Determine whether all bots that belong to the current shell are currently in formation
 def current_shell_in_formation():
-    bots_in_current_shell = [
-        bot for bot in bots if bot.get("shell") == current_shell]
-    return all(bot.get("state") == BotState.IN_FORMATION for bot in bots_in_current_shell)
+    bots_in_current_shell = [bot for bot in bots if bot.shell == current_shell]
+    return all(bot.state == BotState.IN_FORMATION for bot in bots_in_current_shell)
 
 
 if GRID_SIZE % 2 == 0:
-    print("WARNING: Please set GRID_SIZE to an uneven number.")
-   
+    raise Exception("GRID_SIZE should be set to be an even number.")
+
 while robot.step(TIME_STEP) != -1:
     if len(bots) > GRID_SIZE**2:
-        print("WARNING: Excess of bots.")
+        raise Exception("Too many bots.")
 
     while receiver.getQueueLength() > 0:
         bot = None
@@ -154,19 +158,22 @@ while robot.step(TIME_STEP) != -1:
         position = message.get("position")
         dsValues = message.get("dsValues")
         emitter.setChannel(id)
+        ##TODO get dsValues from merge
+        # if id in bot_ids:
+        #     bot = next(bot for bot in bots if bot.get("id") == id)
+        #     bot.update({
+        #         "position": position,
+        #         "dsValues": dsValues,
+        #         "state": get_state(bot)
+        #     })
 
-        if id in bot_ids:
-            bot = next(bot for bot in bots if bot.get("id") == id)
-            bot.update({
-                "position": position,
-                "dsValues": dsValues,
-                "state": get_state(bot)
-            })
-            #TODO check from rebase
-            # bot.update({"position": position})
-            # new_state = get_state(
-            #     bot.get("position"), bot.get("target")
-            # )
+            
+        if id in [bot.id for bot in bots]:
+            if server_state != ServerState.WAITING_FOR_CONNECTIONS:
+                bot = next(bot for bot in bots if bot.id == id)
+                bot.set_position(np.array(position))
+                bot.set_state(get_state(bot))
+                send_message(bot.state)
 
             cd.scan(bot)
 
@@ -181,30 +188,19 @@ while robot.step(TIME_STEP) != -1:
             #     })
             #     print("b", bot)
         else:
-            print(f"Registered bot {id} @ {position}")
-            bots.append({
-                "id": id,
-                "position": np.array(position),
-                "target": None,
-                "state": BotState.IDLE,
-                "dsValues": None,
-                "collision": None,
-                "stateBeforeCollision": None
-            })
-            bot_ids.append(id)
-            bot = bots[-1]
-        
-        send_message(bot.get("state"))
-
-        if server_state == ServerState.WAITING_FOR_CONNECTIONS and len(bots) == GRID_SIZE**2:
-            server_state = ServerState.CALCULATING_OPTIMAL_ASSIGNMENT
-            calculate_optimal_assignment()
-
-        if current_shell_in_formation():
-            if current_shell == MAX_SHELL:
-                server_state = ServerState.ASSIGNING_COLORS
-
-            if server_state == ServerState.WAITING_FOR_FORMATION:
-                current_shell += 1
+            bot = Bot(id=id, position=np.array(position))
+            bots.append(bot)
 
         receiver.nextPacket()
+
+    if server_state == ServerState.WAITING_FOR_CONNECTIONS and len(bots) == GRID_SIZE**2:
+        server_state = ServerState.CALCULATING_OPTIMAL_ASSIGNMENT
+        calculate_optimal_assignment()
+
+    if current_shell_in_formation():
+        if current_shell == MAX_SHELL:
+            server_state = ServerState.ASSIGNING_COLORS
+
+        if server_state == ServerState.WAITING_FOR_FORMATION:
+            current_shell += 1
+
