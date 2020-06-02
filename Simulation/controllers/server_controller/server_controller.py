@@ -14,7 +14,7 @@ from stateDefs import ServerState as ServerState
 TIME_STEP = 32
 POS_TOLERANCE = 0.05
 GRID_SIZE = 5
-GRID_ORIGIN = 0.5
+GRID_ORIGIN = -1
 GRID_SPACING = 0.5
 MAX_SHELL = (GRID_SIZE - 1) / 2
 GRID_POSITIONS = []
@@ -150,7 +150,6 @@ while robot.step(TIME_STEP) != -1:
         bot = None
         raw_data = receiver.getData()
         (id, position) = pickle.loads(raw_data)
-        #print(pickle.loads(raw_data))
         (id, message) = pickle.loads(raw_data)
         position = message.get("position")
         dsValues = message.get("dsValues")
@@ -164,7 +163,7 @@ while robot.step(TIME_STEP) != -1:
                 "state": get_state(bot)
             })
 
-            #cd.scan(bot)
+            cd.scan(bot)
 
         else:
             print(f"Registered bot {id} @ {position}")
@@ -179,9 +178,8 @@ while robot.step(TIME_STEP) != -1:
             })
             bot_ids.append(id)
             bot = bots[-1]
-        
-        print(id, send_message(bot.get("state")))
-        #send_message(bot.get("state"))
+
+        send_message(bot.get("state"))
 
         if server_state == ServerState.WAITING_FOR_CONNECTIONS and len(bots) == GRID_SIZE**2:
             server_state = ServerState.CALCULATING_OPTIMAL_ASSIGNMENT

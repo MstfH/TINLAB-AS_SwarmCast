@@ -8,7 +8,7 @@ WorldInfo {
 }
 Viewpoint {
   orientation 1 0 0 4.71238898038469
-  position 1.8590298575244946 16.121938755179787 1.406842023937942
+  position 2.8269618850198848 30.216444551559764 1.4795848207542819
 }
 TexturedBackground {
 }
@@ -25,84 +25,84 @@ DEF SERVER Robot {
     Receiver {
     }
     Emitter {
-      channel 4914
+      channel 68
     }
   ]
   name "robot(1)"
   controller "server_controller"
 }
 OmniBot {
-  translation 1.34 0.06 1.51
+  translation 4.01 0.06 1.51
 }
 OmniBot {
-  translation -0.22 0.06 1.45
+  translation -2.48 0.06 1.45
 }
 OmniBot {
-  translation 0.62 0.06 -0.78
+  translation 0.62 0.06 -1.82
 }
 OmniBot {
-  translation -0.58 0.06 0.68
+  translation -0.58 0.06 -2.66
 }
 OmniBot {
-  translation -0.3 0.06 -0.23
+  translation -1.99 0.06 -0.23
 }
 OmniBot {
-  translation 0.47 0.06 0.5
+  translation 0.47 0.06 2.66
 }
 OmniBot {
-  translation 1.6 0.06 -0.33
+  translation 1.6 0.06 -2.69
 }
 OmniBot {
-  translation 0.53 0.06 1.95
+  translation -1.33 0.06 3.27
 }
 OmniBot {
-  translation 1.76 0.06 0.7
+  translation 2.8 0.06 1.48
 }
 OmniBot {
-  translation 0.583764 0.06 -0.00279347
+  translation 2.19376 0.06 -0.882794
 }
 OmniBot {
-  translation 0.076523 0.06 0.930877
+  translation -1.32348 0.06 0.930877
 }
 OmniBot {
   translation 0.835225 0.06 1.06175
 }
 OmniBot {
-  translation 2.16 0.06 1.0999999999999999
+  translation 3.03 0.06 0.39
 }
 OmniBot {
   translation 1.29253 0.06 0.314869
 }
 OmniBot {
-  translation 2.04094 0.06 0.147271
+  translation 3.25094 0.06 -0.972729
 }
 OmniBot {
-  translation 2.16153 0.06 1.97636
+  translation 2.82153 0.06 3.89636
 }
 OmniBot {
-  translation 1.58767 0.06 2.10845
+  translation 1.58767 0.06 3.34845
 }
 OmniBot {
-  translation -0.00234261 0.06 0.336604
+  translation -2.34234 0.06 -1.8434
 }
 OmniBot {
-  translation -0.832917 0.06 0.0729312
+  translation -3.28292 0.06 0.0729312
 }
 OmniBot {
-  translation 0.101391 0.06 -0.447452
+  translation 0.101391 0.06 -1.00745
 }
 OmniBot {
-  translation 1.39937 0.06 0.914707
+  translation 1.39937 0.06 2.15471
 }
 OmniBot {
-  translation 0.440442 0.06 1.38908
+  translation -1.34956 0.06 2.50908
 }
 OmniBot {
-  translation -0.785893 0.06 1.56395
+  translation -3.62589 0.06 1.56395
 }
 OmniBot {
-  translation -0.183169 0.06 1.98484
+  translation -3.48317 0.06 2.94484
 }
 OmniBot {
-  translation 2.25931 0.06 0.61945
+  translation -2.75069 0.06 0.61945
 }
