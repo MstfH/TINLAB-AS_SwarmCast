@@ -9,13 +9,13 @@ import sys
 
 from Bot import Bot
 sys.path.append('..')
-from stateDefs import ServerState as ServerState
 from stateDefs import BotState as BotState
+from stateDefs import ServerState as ServerState
 
 TIME_STEP = 32
 POS_TOLERANCE = 0.05
 GRID_SIZE = 3
-GRID_ORIGIN = -1
+GRID_ORIGIN = 0.5
 GRID_SPACING = 0.5
 MAX_SHELL = (GRID_SIZE - 1) / 2
 GRID_POSITIONS = []
@@ -31,7 +31,7 @@ for x in range(GRID_SIZE):
 GRID_POSITIONS = np.array(GRID_POSITIONS)
 print(GRID_POSITIONS)
 
-state = ServerState.WAITING_FOR_CONNECTIONS
+server_state = ServerState.WAITING_FOR_CONNECTIONS
 current_shell = 0
 
 bots = []
@@ -40,6 +40,12 @@ robot = Robot()
 emitter = robot.getEmitter("emitter")
 receiver = robot.getReceiver("receiver")
 receiver.enable(100)
+
+# Simple pythagorean distance between 2 points
+def distance_between(p1, p2):
+    x1, y1 = p1
+    x2, y2 = p2
+    return sqrt((x1 - x2)**2 + (y1 - y2)**2)
 
 # Determine how many steps a given point on the grid is removed from its center
 def get_shell(point):
@@ -55,7 +61,7 @@ def get_shell(point):
 # So that the total cummulative distance traveled is minimal
 # For this, we use the Hungarian method provided by scipy through linear_sum_assignment
 def calculate_optimal_assignment():
-    global state
+    global server_state
     cost = np.empty([len(bots), len(bots)])
     for i in range(len(bots)):
         for j in range(len(bots)):
@@ -68,18 +74,46 @@ def calculate_optimal_assignment():
         bot.set_target(target)
         bot.set_shell(get_shell(target))
     
-    state = ServerState.WAITING_FOR_FORMATION
+    server_state = ServerState.WAITING_FOR_FORMATION
 
 
 def send_message(message):
     emitter.send(pickle.dumps(message))
+
+# Determine whether 2 bots have swapped in the past
+def have_swapped(b1, b2):
+    return b2 in b1.swapped_with or b1 in b2.swapped_with
+
+# Swap the target, state and shell properties of 2 bots
+def swap(b1, b2):
+    target = b1.target
+    state = b1.state
+    shell = b1.shell
+
+    b1.set_target(b2.target)
+    b1.set_state(b2.state)
+    b1.set_shell(b2.shell)
+    b1.append_swapped(b2)
+    
+    b2.set_target(target)
+    b2.set_state(state)
+    b2.set_shell(shell)
+    b2.append_swapped(b1)
 
 # Determine the next state for a bot, based on its own and other bot's properties
 def get_state(bot):
     pos_x, pos_y = bot.position
     target_x, target_y = bot.target
 
-    if bot.shell != current_shell:
+    close_bots = [other_bot for other_bot in bots
+                  if bot.id != other_bot.id
+                  and distance_between(bot.position, other_bot.position) < 0.4]
+
+    for other_bot in close_bots:
+        if not have_swapped(bot, other_bot):
+            swap(bot, other_bot)
+
+    if bot.shell > current_shell:
         return BotState.IDLE
 
     if pos_y - target_y > POS_TOLERANCE:
@@ -116,7 +150,7 @@ while robot.step(TIME_STEP) != -1:
         emitter.setChannel(id)
             
         if id in [bot.id for bot in bots]:
-            if state != ServerState.WAITING_FOR_CONNECTIONS:
+            if server_state != ServerState.WAITING_FOR_CONNECTIONS:
                 bot = next(bot for bot in bots if bot.id == id)
                 bot.set_position(np.array(position))
                 bot.set_state(get_state(bot))
@@ -129,14 +163,14 @@ while robot.step(TIME_STEP) != -1:
         receiver.nextPacket()
 
 
-    if state == ServerState.WAITING_FOR_CONNECTIONS and len(bots) == GRID_SIZE**2:
-        state = ServerState.CALCULATING_OPTIMAL_ASSIGNMENT
-        calculate_optimal_assignment()
+        if server_state == ServerState.WAITING_FOR_CONNECTIONS and len(bots) == GRID_SIZE**2:
+            server_state = ServerState.CALCULATING_OPTIMAL_ASSIGNMENT
+            calculate_optimal_assignment()
 
-    if current_shell_in_formation():
-        if current_shell == MAX_SHELL:
-            state = ServerState.ASSIGNING_COLORS
+        if current_shell_in_formation():
+            if current_shell == MAX_SHELL:
+                server_state = ServerState.ASSIGNING_COLORS
 
-        if state == ServerState.WAITING_FOR_FORMATION:
-            current_shell += 1
+            if server_state == ServerState.WAITING_FOR_FORMATION:
+                current_shell += 1
 
