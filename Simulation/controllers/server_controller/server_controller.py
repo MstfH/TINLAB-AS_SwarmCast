@@ -17,8 +17,8 @@ from stateDefs import ServerState as ServerState
 TIME_STEP = 32
 POS_TOLERANCE = 0.05
 GRID_SIZE = 3
-GRID_ORIGIN = 0.5
-GRID_SPACING = 0.5
+GRID_ORIGIN = 0
+GRID_SPACING = 1
 MAX_SHELL = (GRID_SIZE - 1) / 2
 GRID_POSITIONS = []
 
@@ -52,9 +52,16 @@ supervisor = Supervisor()
 root = supervisor.getRoot()
 root_children = root.getField("children")
 
+def get_random_coordinates():
+    x, z = -2, -2
+    while(True):
+        yield (x, z)
+        x = -3 if x > 3 else x + 0.8 + (random.randint(0, 3) / 10)
+        z = z + 1.5 if x == -3 else z + (random.randint(-3, 3) / 10) 
+
+coordinate_generator = get_random_coordinates()
 for i in range(GRID_SIZE**2):
-    x = random.randint(-20, 20) / 10
-    z = random.randint(-20, 20) / 10
+    x, z = next(coordinate_generator)
     root_children.importMFNodeFromString(-1, f"OmniBot {{translation {x} 0.06 {z}}}")
 
 emitter = supervisor.getEmitter("emitter")
