@@ -6,8 +6,9 @@ from math import sqrt
 import numpy as np
 from scipy.optimize import linear_sum_assignment
 import sys
-
+from PIL import Image
 from Bot import Bot
+
 sys.path.append('..')
 from stateDefs import BotState as BotState
 from stateDefs import ServerState as ServerState
@@ -20,7 +21,6 @@ GRID_SPACING = 0.5
 MAX_SHELL = (GRID_SIZE - 1) / 2
 GRID_POSITIONS = []
 
-
 for x in range(GRID_SIZE):
     for y in range(GRID_SIZE):
         GRID_POSITIONS.append([
@@ -31,7 +31,18 @@ for x in range(GRID_SIZE):
 GRID_POSITIONS = np.array(GRID_POSITIONS)
 print(GRID_POSITIONS)
 
+PIXEL_MAP = {}
+IMAGE_NAME = "flag.png"
+image = Image.open(IMAGE_NAME)
+IMAGE_DATA = np.asarray(image)
+IMAGE_DATA = IMAGE_DATA.reshape(GRID_SIZE**2, 3)
+
+for color_value, position in zip(IMAGE_DATA, GRID_POSITIONS):
+    color = '0x%02x%02x%02x' % tuple(color_value)
+    PIXEL_MAP.update({tuple(position): color})
+    
 server_state = ServerState.WAITING_FOR_CONNECTIONS
+
 current_shell = 0
 
 bots = []
@@ -73,6 +84,7 @@ def calculate_optimal_assignment():
         target = GRID_POSITIONS[col_i]
         bot.set_target(target)
         bot.set_shell(get_shell(target))
+        bot.set_color(PIXEL_MAP.get(tuple(target)))
     
     server_state = ServerState.WAITING_FOR_FORMATION
 
@@ -87,17 +99,17 @@ def have_swapped(b1, b2):
 # Swap the target, state and shell properties of 2 bots
 def swap(b1, b2):
     target = b1.target
-    state = b1.state
     shell = b1.shell
+    color = b1.color
 
     b1.set_target(b2.target)
-    b1.set_state(b2.state)
     b1.set_shell(b2.shell)
+    b1.set_color(b2.color)
     b1.append_swapped(b2)
     
     b2.set_target(target)
-    b2.set_state(state)
     b2.set_shell(shell)
+    b2.set_color(color)
     b2.append_swapped(b1)
 
 # Determine the next state for a bot, based on its own and other bot's properties
@@ -154,7 +166,8 @@ while robot.step(TIME_STEP) != -1:
                 bot = next(bot for bot in bots if bot.id == id)
                 bot.set_position(np.array(position))
                 bot.set_state(get_state(bot))
-                send_message(bot.state)
+                downlink_data = (bot.state, bot.color)
+                send_message(downlink_data)
 
         else:
             bot = Bot(id=id, position=np.array(position))
@@ -168,7 +181,7 @@ while robot.step(TIME_STEP) != -1:
 
     if current_shell_in_formation():
         if current_shell == MAX_SHELL:
-            server_state = ServerState.ASSIGNING_COLORS
+            server_state = ServerState.DONE
 
         if server_state == ServerState.WAITING_FOR_FORMATION:
             current_shell += 1
