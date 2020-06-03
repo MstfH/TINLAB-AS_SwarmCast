@@ -17,9 +17,10 @@ TIME_STEP = 32
 POS_TOLERANCE = 0.05
 GRID_SIZE = 3
 GRID_ORIGIN = 0.5
-GRID_SPACING = 0.5
+GRID_SPACING = 1.0 #was 0.5
 MAX_SHELL = (GRID_SIZE - 1) / 2
 GRID_POSITIONS = []
+SWAP_TOLERANCE = 0.5 #was 0.4
 
 
 for x in range(GRID_SIZE):
@@ -88,7 +89,8 @@ def send_message(message):
 
 # Determine whether 2 bots have swapped in the past
 def have_swapped(b1, b2):
-    return b2 in b1.swapped_with or b1 in b2.swapped_with
+    #return b2 in b1.swapped_with or b1 in b2.swapped_with
+    return b2 in b1.swapdeque or b1 in b2.swapdeque
 
 # Swap the target, state and shell properties of 2 bots
 def swap(b1, b2):
@@ -99,12 +101,14 @@ def swap(b1, b2):
     b1.set_target(b2.target)
     b1.set_state(b2.state)
     b1.set_shell(b2.shell)
-    b1.append_swapped(b2)
+    #b1.append_swapped(b2)
+    b1.append_swapdeque(b2)
     
     b2.set_target(target)
     b2.set_state(state)
     b2.set_shell(shell)
-    b2.append_swapped(b1)
+    #b2.append_swapped(b1)
+    b2.append_swapdeque(b1)
 
 # Determine the next state for a bot, based on its own and other bot's properties
 def get_state(bot):
@@ -113,7 +117,7 @@ def get_state(bot):
 
     close_bots = [other_bot for other_bot in bots
                   if bot.id != other_bot.id
-                  and distance_between(bot.position, other_bot.position) < 0.4]
+                  and distance_between(bot.position, other_bot.position) < SWAP_TOLERANCE]
 
     for other_bot in close_bots:
         if not have_swapped(bot, other_bot):
@@ -158,35 +162,18 @@ while robot.step(TIME_STEP) != -1:
         position = message.get("position")
         dsValues = message.get("dsValues")
         emitter.setChannel(id)
-        ##TODO get dsValues from merge
-        # if id in bot_ids:
-        #     bot = next(bot for bot in bots if bot.get("id") == id)
-        #     bot.update({
-        #         "position": position,
-        #         "dsValues": dsValues,
-        #         "state": get_state(bot)
-        #     })
-
             
         if id in [bot.id for bot in bots]:
             if server_state != ServerState.WAITING_FOR_CONNECTIONS:
                 bot = next(bot for bot in bots if bot.id == id)
                 bot.set_position(np.array(position))
+                bot.set_dsValues(dsValues)
                 bot.set_state(get_state(bot))
+
+                cd.scan(bot)
+
                 send_message(bot.state)
 
-            cd.scan(bot)
-
-            #if id in cd.collision_queue:
-
-
-            # print("a", bot)
-            # if bot.get("state") == BRAKE_RELEASED:
-            #     bot.update({
-            #         "state": bot.get("stateBeforeCollision"),
-            #         "stateBeforeCollision": None
-            #     })
-            #     print("b", bot)
         else:
             bot = Bot(id=id, position=np.array(position))
             bots.append(bot)

@@ -3,6 +3,7 @@ import numpy as np
 
 
 import sys
+from Bot import Bot
 sys.path.append('..')
 from stateDefs import ServerState as ServerState
 from stateDefs import BotState as BotState
@@ -29,16 +30,15 @@ movementKey={
     tuple([6]) :       BotState.TRAVELLING_SOUTH,
     tuple([6, 7]) :    BotState.TRAVELLING_SOUTH,
     tuple([7]) :       BotState.TRAVELLING_SOUTH,
-    tuple([7, 0]) :    BotState.TRAVELLING_EAST
+    tuple([0, 7]) :    BotState.TRAVELLING_EAST
 }
 
 def avoidCollision(bot, collisionAngles):
     #collisionAngles=repr(collisionAngles)
     movement = movementKey.get(collisionAngles)
-    bot.update({
-        "state": movement
-    })
-    print(bot)
+    if movement == None:
+        movement = BotState.IDLE
+    bot.set_state(movement)
 
 def parse(dsValues):
     '''
@@ -51,29 +51,31 @@ def parse(dsValues):
             boolArray[dsValues.index(i)] = True
     trippedSensors = np.nonzero(boolArray)
     return trippedSensors[0] #first element only needed
+
+def logCollision(bot, collisionAngles):
+    bot.set_stateBeforeCollision(bot.state)
+    bot.set_state(BotState.EMERGENCY_BRAKE)
+    bot.set_collision(collisionAngles)
     
 def scan(bot):
     '''
     scans the distance sensor values, stopping the bot if
     proximity limit is exceeded. Adds to collision queue.
     '''
-    collisionAngles = parse(bot.get("dsValues"))
-    ID = bot.get("id")
+    collisionAngles = parse(bot.dsValues)
+    #print(collisionAngles)
+    ID = bot.id
     if(np.size(collisionAngles) > 0):
         collisionAngles=tuple(collisionAngles)
 
-        if bot.get('state') == BotState.IN_FORMATION:
+        if bot.state == BotState.IN_FORMATION:
             print(ID, 'in formation. Ignoring collision')
             if ID in collision_queue:
                 collision_queue.pop(ID)
         else:
             print("Proximity Warning bot:", ID, collisionAngles)
-            bot.update({
-                "stateBeforeCollision": bot.get("state"),
-                "state": BotState.EMERGENCY_BRAKE,
-                "collision": collisionAngles
-            })
 
+            logCollision(bot, collisionAngles)
             collision_queue.update({ID : collisionAngles})
 
             avoidCollision(bot, collisionAngles)

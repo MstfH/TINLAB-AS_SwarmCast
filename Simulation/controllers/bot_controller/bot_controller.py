@@ -104,6 +104,10 @@ while supervisor.step(TIME_STEP) != -1:
         raw_data = receiver.getData()
         direction = pickle.loads(raw_data)
         move(direction)
+        # try:
+        #     move(direction)
+        # except TypeError:
+        #     print(ID, "cant move to", direction)
         receiver.nextPacket()
     dsValues = readSensors()
     current_position = translation_field.getSFVec3f()

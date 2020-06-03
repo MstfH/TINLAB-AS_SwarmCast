@@ -1,8 +1,12 @@
 import sys
 
+from collections import deque
+
 sys.path.append('..')
 from stateDefs import ServerState as ServerState
 from stateDefs import BotState as BotState
+
+dequeLen = 3
 
 class Bot:
 
@@ -14,6 +18,10 @@ class Bot:
         self.shell = None
         self.swapped_with = []
         self.state = BotState.IDLE
+        self.dsValues = []
+        self.collision = []
+        self.stateBeforeCollision = None
+        self.swapdeque = deque(maxlen=4)
 
     def set_position(self, position):
         self.position = position
@@ -26,6 +34,18 @@ class Bot:
 
     def append_swapped(self, bot):
         self.swapped_with.append(bot)
+    
+    def append_swapdeque(self, bot):
+        self.swapdeque.append(bot)
 
     def set_state(self, state):
         self.state = state
+    
+    def set_dsValues(self, dsValues):
+        self.dsValues = dsValues
+
+    def set_collision(self, collision):
+        self.collision = collision
+    
+    def set_stateBeforeCollision(self, stateBeforeCollision):
+        self.stateBeforeCollision = stateBeforeCollision
