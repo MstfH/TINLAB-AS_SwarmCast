@@ -9,7 +9,7 @@ from stateDefs import BotState as BotState
 
 SPEED_FACTOR = 3
 TIME_STEP = 32
-ID = random.randint(1, 10000)
+ID = random.randint(1, 1000000)
 direction = None
 color = None
 
