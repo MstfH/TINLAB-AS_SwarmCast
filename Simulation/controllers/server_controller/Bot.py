@@ -18,10 +18,7 @@ class Bot:
         self.shell = None
         self.swapped_with = []
         self.state = BotState.IDLE
-        self.dsValues = []
-        self.collision = []
-        self.stateBeforeCollision = None
-        self.swapdeque = deque(maxlen=4)
+        self.heading = 0
         self.color = "0x000000"
 
     def set_position(self, position):
@@ -42,6 +39,9 @@ class Bot:
     def set_state(self, state):
         self.state = state
 
+    def set_heading(self, heading):
+        self.heading = heading
+        
     def set_color(self, color):
         self.color = color
     
