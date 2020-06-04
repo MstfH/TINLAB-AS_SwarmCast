@@ -6,7 +6,12 @@ PROTO OmniBot [
     Robot {
     translation IS translation
     rotation 1 0 0 0
+    controller IS controller
     supervisor TRUE
+    physics Physics {
+        density -1
+        mass 0.1
+    }
     children [
     Solid {
       translation 0 0.11 -0.08
@@ -1090,11 +1095,5 @@ PROTO OmniBot [
         ]
         }
     ]
-    physics Physics {
-        density -1
-        mass 0.1
-    }
-    controller IS controller
-  supervisor TRUE
     }
 }
