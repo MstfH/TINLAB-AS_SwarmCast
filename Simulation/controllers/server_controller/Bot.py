@@ -14,6 +14,7 @@ class Bot:
         self.shell = None
         self.swapped_with = []
         self.state = BotState.IDLE
+        self.heading = 0
 
     def set_position(self, position):
         self.position = position
@@ -29,3 +30,6 @@ class Bot:
 
     def set_state(self, state):
         self.state = state
+
+    def set_heading(self, heading):
+        self.heading = heading

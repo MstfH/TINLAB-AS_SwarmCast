@@ -83,7 +83,9 @@ def move(direction):
         BotState.TRAVELLING_EAST: move_east,
         BotState.TRAVELLING_SOUTH: move_south,
         BotState.TRAVELLING_WEST: move_west,
-        BotState.IN_FORMATION: stop_wheels
+        BotState.IN_FORMATION: stop_wheels,
+        BotState.TURNING_CW: cw,
+        BotState.TURNING_CCW: ccw
     }
     func = move_map.get(direction)
     func()
@@ -97,11 +99,12 @@ while supervisor.step(TIME_STEP) != -1:
 
     current_position = translation_field.getSFVec3f()
     (x, _, z) = current_position
-    send_message([x, z])
-    
-    (_,_,cz) = compass.getValues()
-    cz = round(cz,5)
-    if cz < (0 - AUTOCORRECT_TOLERANCE):
-        ccw()
-    elif cz > (0 + AUTOCORRECT_TOLERANCE):
-        cw()
+    (_,_,heading) = compass.getValues()
+    heading = round(heading,5)
+    x = round(x,3)
+    z = round(z,3)
+    message = {
+        "position" : [x, z],
+        "heading" : heading
+        }
+    send_message(message)
