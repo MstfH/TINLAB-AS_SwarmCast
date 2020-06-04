@@ -1,7 +1,8 @@
 """sever_controller controller."""
 
-from controller import Robot
+from controller import Supervisor
 import pickle
+import random
 from math import sqrt
 import numpy as np
 from scipy.optimize import linear_sum_assignment
@@ -16,8 +17,8 @@ from stateDefs import ServerState as ServerState
 TIME_STEP = 32
 POS_TOLERANCE = 0.05
 GRID_SIZE = 3
-GRID_ORIGIN = 0.5
-GRID_SPACING = 0.5
+GRID_ORIGIN = 0
+GRID_SPACING = 1
 MAX_SHELL = (GRID_SIZE - 1) / 2
 GRID_POSITIONS = []
 
@@ -47,9 +48,24 @@ current_shell = 0
 
 bots = []
 
-robot = Robot()
-emitter = robot.getEmitter("emitter")
-receiver = robot.getReceiver("receiver")
+supervisor = Supervisor()
+root = supervisor.getRoot()
+root_children = root.getField("children")
+
+def get_random_coordinates():
+    x, z = -2, -2
+    while(True):
+        yield (x, z)
+        x = -3 if x > 3 else x + 0.8 + (random.randint(0, 3) / 10)
+        z = z + 1.5 if x == -3 else z + (random.randint(-3, 3) / 10) 
+
+coordinate_generator = get_random_coordinates()
+for i in range(GRID_SIZE**2):
+    x, z = next(coordinate_generator)
+    root_children.importMFNodeFromString(-1, f"OmniBot {{translation {x} 0.06 {z}}}")
+
+emitter = supervisor.getEmitter("emitter")
+receiver = supervisor.getReceiver("receiver")
 receiver.enable(100)
 
 # Simple pythagorean distance between 2 points
@@ -151,9 +167,7 @@ def current_shell_in_formation():
 if GRID_SIZE % 2 == 0:
     raise Exception("GRID_SIZE should be set to be an even number.")
 
-while robot.step(TIME_STEP) != -1:
-    if len(bots) > GRID_SIZE**2:
-        raise Exception("Too many bots.")
+while supervisor.step(TIME_STEP) != -1:
 
     while receiver.getQueueLength() > 0:
         bot = None

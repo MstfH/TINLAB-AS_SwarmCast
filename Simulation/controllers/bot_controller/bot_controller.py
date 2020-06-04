@@ -9,7 +9,7 @@ from stateDefs import BotState as BotState
 
 SPEED_FACTOR = 3
 TIME_STEP = 32
-ID = random.randint(1, 10000)
+ID = random.randint(1, 1000000)
 direction = None
 color = None
 
@@ -84,7 +84,7 @@ def move(direction):
 
 while supervisor.step(TIME_STEP) != -1:
 
-    if supervisor.getSelected().getId == supervisor.getSelf().getId:
+    if supervisor.getSelected() and supervisor.getSelected().getId() == supervisor.getSelf().getId():
         print(f"Selected: <{ID}> {direction}")
 
     while receiver.getQueueLength() > 0:
