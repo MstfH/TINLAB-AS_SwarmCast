@@ -3,7 +3,7 @@
 from controller import Supervisor
 import pickle
 import random
-from math import sqrt
+import math
 import numpy as np
 from scipy.optimize import linear_sum_assignment
 import sys
@@ -74,7 +74,7 @@ receiver.enable(TIME_STEP)
 def distance_between(p1, p2):
     x1, y1 = p1
     x2, y2 = p2
-    return sqrt((x1 - x2)**2 + (y1 - y2)**2)
+    return math.sqrt((x1 - x2)**2 + (y1 - y2)**2)
 
 # Determine how many steps a given point on the grid is removed from its center
 def get_shell(point):
@@ -137,7 +137,7 @@ def get_state(bot):
 
     close_bots = [other_bot for other_bot in bots
                   if bot.id != other_bot.id
-                  and distance_between(bot.position, other_bot.position) < 0.4]
+                  and distance_between(bot.position, other_bot.position) < 0.35]
 
     for other_bot in close_bots:
         if not have_swapped(bot, other_bot):
@@ -170,6 +170,25 @@ def get_state(bot):
 def current_shell_in_formation():
     bots_in_current_shell = [bot for bot in bots if bot.shell == current_shell]
     return all(bot.state == BotState.IN_FORMATION for bot in bots_in_current_shell)
+
+def all_bots_in_formation():
+    return all(bot.state == BotState.IN_FORMATION for bot in bots)
+
+def offset_all_bots(point):
+    point_x, point_y = point
+    for bot in bots:
+        target_x, target_y = bot.target
+        bot.target = (target_x + point_x, target_y + point_y)
+
+def get_next_offset():
+    i = 0
+    while True:
+        offset = [math.cos(i * math.pi)  * 0.5, math.sin(i * math.pi) * 0.5]
+        i = i + 0.5
+        yield offset
+
+
+offset_generator = get_next_offset()
 
 
 if GRID_SIZE % 2 == 0:
@@ -206,8 +225,12 @@ while supervisor.step(TIME_STEP) != -1:
 
     if current_shell_in_formation():
         if current_shell == MAX_SHELL:
-            server_state = ServerState.DONE
+            server_state = ServerState.MOVING_AS_SWARM
 
         if server_state == ServerState.WAITING_FOR_FORMATION:
             current_shell += 1
+
+    if server_state == ServerState.MOVING_AS_SWARM and all_bots_in_formation():
+        offset = next(offset_generator)
+        offset_all_bots(offset)
 
