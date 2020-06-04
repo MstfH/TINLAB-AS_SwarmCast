@@ -44,3 +44,12 @@ class Bot:
 
     def set_color(self, color):
         self.color = color
+    
+    def set_dsValues(self, dsValues):
+        self.dsValues = dsValues
+    
+    def set_stateBeforeCollision(self, stateBeforeCollision):
+        self.stateBeforeCollision = stateBeforeCollision
+    
+    def set_collision(self, collision):
+        self.collision = collision
