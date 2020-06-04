@@ -10,6 +10,7 @@ from stateDefs import BotState as BotState
 SPEED_FACTOR = 3
 TIME_STEP = 32
 ID = random.randint(1, 10000)
+AUTOCORRECT_TOLERANCE = 0.10
 
 supervisor = Supervisor()
 robot_node = supervisor.getSelf()
@@ -17,8 +18,10 @@ translation_field = robot_node.getField("translation")
 
 emitter = supervisor.getEmitter("emitter")
 receiver = supervisor.getReceiver("receiver")
-receiver.enable(100)
+receiver.enable(TIME_STEP)
 receiver.setChannel(ID)
+compass = supervisor.getCompass("compass")
+compass.enable(TIME_STEP)
 
 wheels = [
     supervisor.getMotor("wheel1"),
@@ -33,7 +36,16 @@ for wheel in wheels:
 
 def send_message(message):
     emitter.send(pickle.dumps((ID, message)))
+    
+def cw():
+    wheels[0].setVelocity(1)
+    wheels[1].setVelocity(1)
+    wheels[2].setVelocity(1)
 
+def ccw():
+    wheels[0].setVelocity(-1)
+    wheels[1].setVelocity(-1)
+    wheels[2].setVelocity(-1)
 
 def stop_wheels():
     wheels[0].setVelocity(0)
@@ -86,3 +98,12 @@ while supervisor.step(TIME_STEP) != -1:
     current_position = translation_field.getSFVec3f()
     (x, _, z) = current_position
     send_message([x, z])
+    
+    (_,_,cz) = compass.getValues()
+    cz = round(cz,5)
+    if cz < (0 - AUTOCORRECT_TOLERANCE):
+        ccw()
+    elif cz > (0 + AUTOCORRECT_TOLERANCE):
+        cw()
+    else:
+        stop_wheels()

@@ -8,6 +8,25 @@ PROTO OmniBot [
     rotation 1 0 0 0
     supervisor TRUE
     children [
+    Solid {
+      translation 0 0.11 -0.08
+      children [
+        Shape {
+          appearance PBRAppearance {
+          }
+          geometry Plane {
+            size 0.03 0.03
+          }
+          castShadows FALSE
+          isPickable FALSE
+        }
+      ]
+      name "north_marker"
+    }
+    Compass {
+      xAxis FALSE
+      yAxis FALSE
+    }
         DEF SKIRT Transform {
         children [
             DEF SUPPORT Solid {
@@ -65,6 +84,8 @@ PROTO OmniBot [
                 metalness 0
             }
             physics Physics {
+            density -1
+            mass 0.1
             }
             }
         ]
@@ -1078,7 +1099,10 @@ PROTO OmniBot [
         }
     ]
     physics Physics {
+        density -1
+        mass 0.1
     }
     controller IS controller
+  supervisor TRUE
     }
 }
