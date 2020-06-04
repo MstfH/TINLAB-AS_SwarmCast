@@ -25,6 +25,8 @@ MAX_SHELL = (GRID_SIZE - 1) / 2
 GRID_POSITIONS = []
 SWAP_TOLERANCE = 0.5 #was 0.4
 
+ENABLE_SHELLING = False
+
 HEADING_CORR_TOLERANCE = 0.10
 
 for x in range(GRID_SIZE):
@@ -155,7 +157,7 @@ def get_state(bot):
     if heading > (0 + HEADING_CORR_TOLERANCE):
         return BotState.TURNING_CW
 
-    if bot.shell > current_shell:
+    if bot.shell > current_shell and ENABLE_SHELLING:
         return BotState.IDLE
 
     if pos_y - target_y > POS_TOLERANCE:

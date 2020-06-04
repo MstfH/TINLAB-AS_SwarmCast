@@ -1095,6 +1095,5 @@ PROTO OmniBot [
         mass 0.1
     }
     controller IS controller
-  supervisor TRUE
     }
 }
