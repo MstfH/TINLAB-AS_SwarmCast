@@ -10,6 +10,8 @@ from stateDefs import BotState as BotState
 SPEED_FACTOR = 3
 TIME_STEP = 32
 ID = random.randint(1, 10000)
+direction = None
+color = None
 
 supervisor = Supervisor()
 robot_node = supervisor.getSelf()
@@ -81,6 +83,10 @@ def move(direction):
     func()
 
 while supervisor.step(TIME_STEP) != -1:
+
+    if supervisor.getSelected().getId == supervisor.getSelf().getId:
+        print(f"Selected: <{ID}> {direction}")
+
     while receiver.getQueueLength() > 0:
         raw_data = receiver.getData()
         direction, color = pickle.loads(raw_data)
