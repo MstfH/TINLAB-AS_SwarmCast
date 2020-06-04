@@ -2,13 +2,16 @@
 
 from controller import Robot
 import collisionDetection as cd
+from controller import Supervisor
 import pickle
+import random
 from math import sqrt
 import numpy as np
 from scipy.optimize import linear_sum_assignment
 import sys
-
+from PIL import Image
 from Bot import Bot
+
 sys.path.append('..')
 from stateDefs import BotState as BotState
 from stateDefs import ServerState as ServerState
@@ -16,12 +19,11 @@ from stateDefs import ServerState as ServerState
 TIME_STEP = 32
 POS_TOLERANCE = 0.05
 GRID_SIZE = 3
-GRID_ORIGIN = 0.5
-GRID_SPACING = 1.0 #was 0.5
+GRID_ORIGIN = 0
+GRID_SPACING = 1
 MAX_SHELL = (GRID_SIZE - 1) / 2
 GRID_POSITIONS = []
 SWAP_TOLERANCE = 0.5 #was 0.4
-
 
 for x in range(GRID_SIZE):
     for y in range(GRID_SIZE):
@@ -33,20 +35,41 @@ for x in range(GRID_SIZE):
 GRID_POSITIONS = np.array(GRID_POSITIONS)
 print(GRID_POSITIONS)
 
+PIXEL_MAP = {}
+IMAGE_NAME = "flag.png"
+image = Image.open(IMAGE_NAME)
+IMAGE_DATA = np.asarray(image)
+IMAGE_DATA = IMAGE_DATA.reshape(GRID_SIZE**2, 3)
+
+for color_value, position in zip(IMAGE_DATA, GRID_POSITIONS):
+    color = '0x%02x%02x%02x' % tuple(color_value)
+    PIXEL_MAP.update({tuple(position): color})
+    
 server_state = ServerState.WAITING_FOR_CONNECTIONS
+
 current_shell = 0
 
 bots = []
-robot = Robot()
-emitter = robot.getEmitter("emitter")
-receiver = robot.getReceiver("receiver")
-receiver.enable(TIME_STEP)
 
+supervisor = Supervisor()
+root = supervisor.getRoot()
+root_children = root.getField("children")
 
-def distance_between(p1, p2):
-    x1, y1 = p1
-    x2, y2 = p2
-    return sqrt((x1 - x2)**2 + (y1 - y2)**2)
+def get_random_coordinates():
+    x, z = -2, -2
+    while(True):
+        yield (x, z)
+        x = -3 if x > 3 else x + 0.8 + (random.randint(0, 3) / 10)
+        z = z + 1.5 if x == -3 else z + (random.randint(-3, 3) / 10) 
+
+coordinate_generator = get_random_coordinates()
+for i in range(GRID_SIZE**2):
+    x, z = next(coordinate_generator)
+    root_children.importMFNodeFromString(-1, f"OmniBot {{translation {x} 0.06 {z}}}")
+
+emitter = supervisor.getEmitter("emitter")
+receiver = supervisor.getReceiver("receiver")
+receiver.enable(100)
 
 # Simple pythagorean distance between 2 points
 def distance_between(p1, p2):
@@ -80,6 +103,7 @@ def calculate_optimal_assignment():
         target = GRID_POSITIONS[col_i]
         bot.set_target(target)
         bot.set_shell(get_shell(target))
+        bot.set_color(PIXEL_MAP.get(tuple(target)))
     
     server_state = ServerState.WAITING_FOR_FORMATION
 
@@ -95,18 +119,18 @@ def have_swapped(b1, b2):
 # Swap the target, state and shell properties of 2 bots
 def swap(b1, b2):
     target = b1.target
-    state = b1.state
     shell = b1.shell
+    color = b1.color
 
     b1.set_target(b2.target)
-    b1.set_state(b2.state)
     b1.set_shell(b2.shell)
+    b1.set_color(b2.color)
     #b1.append_swapped(b2)
     b1.append_swapdeque(b2)
     
     b2.set_target(target)
-    b2.set_state(state)
     b2.set_shell(shell)
+    b2.set_color(color)
     #b2.append_swapped(b1)
     b2.append_swapdeque(b1)
 
@@ -149,9 +173,7 @@ def current_shell_in_formation():
 if GRID_SIZE % 2 == 0:
     raise Exception("GRID_SIZE should be set to be an even number.")
 
-while robot.step(TIME_STEP) != -1:
-    if len(bots) > GRID_SIZE**2:
-        raise Exception("Too many bots.")
+while supervisor.step(TIME_STEP) != -1:
 
     while receiver.getQueueLength() > 0:
         bot = None
@@ -172,7 +194,8 @@ while robot.step(TIME_STEP) != -1:
 
                 cd.scan(bot)
 
-                send_message(bot.state)
+                downlink_data = (bot.state, bot.color)
+                send_message(downlink_data)
 
         else:
             bot = Bot(id=id, position=np.array(position))
@@ -186,7 +209,7 @@ while robot.step(TIME_STEP) != -1:
 
     if current_shell_in_formation():
         if current_shell == MAX_SHELL:
-            server_state = ServerState.ASSIGNING_COLORS
+            server_state = ServerState.DONE
 
         if server_state == ServerState.WAITING_FOR_FORMATION:
             current_shell += 1

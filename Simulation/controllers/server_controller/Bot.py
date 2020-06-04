@@ -22,6 +22,7 @@ class Bot:
         self.collision = []
         self.stateBeforeCollision = None
         self.swapdeque = deque(maxlen=4)
+        self.color = "0x000000"
 
     def set_position(self, position):
         self.position = position
@@ -40,12 +41,6 @@ class Bot:
 
     def set_state(self, state):
         self.state = state
-    
-    def set_dsValues(self, dsValues):
-        self.dsValues = dsValues
 
-    def set_collision(self, collision):
-        self.collision = collision
-    
-    def set_stateBeforeCollision(self, stateBeforeCollision):
-        self.stateBeforeCollision = stateBeforeCollision
+    def set_color(self, color):
+        self.color = color
