@@ -30,9 +30,13 @@ for wheel in wheels:
     wheel.setPosition(float('inf'))
     wheel.setVelocity(0.0)
 
+led = supervisor.getLED("led")
 
 def send_message(message):
     emitter.send(pickle.dumps((ID, message)))
+
+def set_color(color):
+    led.set(int(color, 16))
 
 
 def stop_wheels():
@@ -79,8 +83,9 @@ def move(direction):
 while supervisor.step(TIME_STEP) != -1:
     while receiver.getQueueLength() > 0:
         raw_data = receiver.getData()
-        direction = pickle.loads(raw_data)
+        direction, color = pickle.loads(raw_data)
         move(direction)
+        set_color(color)
         receiver.nextPacket()
 
     current_position = translation_field.getSFVec3f()
