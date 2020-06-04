@@ -105,5 +105,3 @@ while supervisor.step(TIME_STEP) != -1:
         ccw()
     elif cz > (0 + AUTOCORRECT_TOLERANCE):
         cw()
-    else:
-        stop_wheels()
