@@ -22,6 +22,8 @@ GRID_SPACING = 1
 MAX_SHELL = (GRID_SIZE - 1) / 2
 GRID_POSITIONS = []
 
+HEADING_CORR_TOLERANCE = 0.10
+
 for x in range(GRID_SIZE):
     for y in range(GRID_SIZE):
         GRID_POSITIONS.append([
@@ -66,7 +68,7 @@ for i in range(GRID_SIZE**2):
 
 emitter = supervisor.getEmitter("emitter")
 receiver = supervisor.getReceiver("receiver")
-receiver.enable(100)
+receiver.enable(TIME_STEP)
 
 # Simple pythagorean distance between 2 points
 def distance_between(p1, p2):
@@ -141,6 +143,12 @@ def get_state(bot):
         if not have_swapped(bot, other_bot):
             swap(bot, other_bot)
 
+    if heading < (0 - HEADING_CORR_TOLERANCE):
+        return BotState.TURNING_CCW
+    
+    if heading > (0 + HEADING_CORR_TOLERANCE):
+        return BotState.TURNING_CW
+
     if bot.shell > current_shell:
         return BotState.IDLE
 
@@ -172,13 +180,16 @@ while supervisor.step(TIME_STEP) != -1:
     while receiver.getQueueLength() > 0:
         bot = None
         raw_data = receiver.getData()
-        (id, position) = pickle.loads(raw_data)
+        (id, message) = pickle.loads(raw_data)
+        position = message.get("position")
+        heading = message.get("heading")
         emitter.setChannel(id)
             
         if id in [bot.id for bot in bots]:
             if server_state != ServerState.WAITING_FOR_CONNECTIONS:
                 bot = next(bot for bot in bots if bot.id == id)
                 bot.set_position(np.array(position))
+                bot.set_heading(heading)
                 bot.set_state(get_state(bot))
                 downlink_data = (bot.state, bot.color)
                 send_message(downlink_data)

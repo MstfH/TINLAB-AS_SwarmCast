@@ -19,8 +19,10 @@ translation_field = robot_node.getField("translation")
 
 emitter = supervisor.getEmitter("emitter")
 receiver = supervisor.getReceiver("receiver")
-receiver.enable(100)
+receiver.enable(TIME_STEP)
 receiver.setChannel(ID)
+compass = supervisor.getCompass("compass")
+compass.enable(TIME_STEP)
 
 wheels = [
     supervisor.getMotor("wheel1"),
@@ -36,7 +38,17 @@ led = supervisor.getLED("led")
 
 def send_message(message):
     emitter.send(pickle.dumps((ID, message)))
+    
+def cw():
+    wheels[0].setVelocity(1)
+    wheels[1].setVelocity(1)
+    wheels[2].setVelocity(1)
 
+def ccw():
+    wheels[0].setVelocity(-1)
+    wheels[1].setVelocity(-1)
+    wheels[2].setVelocity(-1)
+    
 def set_color(color):
     led.set(int(color, 16))
 
@@ -77,7 +89,9 @@ def move(direction):
         BotState.TRAVELLING_EAST: move_east,
         BotState.TRAVELLING_SOUTH: move_south,
         BotState.TRAVELLING_WEST: move_west,
-        BotState.IN_FORMATION: stop_wheels
+        BotState.IN_FORMATION: stop_wheels,
+        BotState.TURNING_CW: cw,
+        BotState.TURNING_CCW: ccw
     }
     func = move_map.get(direction)
     func()
@@ -96,4 +110,12 @@ while supervisor.step(TIME_STEP) != -1:
 
     current_position = translation_field.getSFVec3f()
     (x, _, z) = current_position
-    send_message([x, z])
+    (_,_,heading) = compass.getValues()
+    heading = round(heading,5)
+    x = round(x,3)
+    z = round(z,3)
+    message = {
+        "position" : [x, z],
+        "heading" : heading
+        }
+    send_message(message)

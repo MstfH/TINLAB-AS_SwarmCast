@@ -13,3 +13,5 @@ class BotState(Enum):
     TRAVELLING_SOUTH = 'S'
     TRAVELLING_WEST = 'W'
     IN_FORMATION = 'IF'
+    TURNING_CW = 'CW'
+    TURNING_CCW = 'CCW'
