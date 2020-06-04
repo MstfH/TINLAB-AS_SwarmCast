@@ -4,8 +4,7 @@ class ServerState(Enum):
     WAITING_FOR_CONNECTIONS = 1
     CALCULATING_OPTIMAL_ASSIGNMENT = 2
     WAITING_FOR_FORMATION = 3
-    ASSIGNING_COLORS = 4
-    DONE = 0
+    DONE = 4
 
 class BotState(Enum):
     IDLE = 'I'

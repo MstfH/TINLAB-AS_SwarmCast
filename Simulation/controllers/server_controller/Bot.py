@@ -15,6 +15,7 @@ class Bot:
         self.swapped_with = []
         self.state = BotState.IDLE
         self.heading = 0
+        self.color = "0x000000"
 
     def set_position(self, position):
         self.position = position
@@ -33,3 +34,6 @@ class Bot:
 
     def set_heading(self, heading):
         self.heading = heading
+        
+    def set_color(self, color):
+        self.color = color
