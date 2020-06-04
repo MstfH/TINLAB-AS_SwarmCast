@@ -84,7 +84,7 @@ def move(direction):
 
 while supervisor.step(TIME_STEP) != -1:
 
-    if supervisor.getSelected().getId == supervisor.getSelf().getId:
+    if supervisor.getSelected() and supervisor.getSelected().getId() == supervisor.getSelf().getId():
         print(f"Selected: <{ID}> {direction}")
 
     while receiver.getQueueLength() > 0:
