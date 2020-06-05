@@ -3,9 +3,12 @@
 # Python imports
 import time
 import json
+import threading
 
 # Custom imports
 import robot
+import distanceSensorLogic as dSLogic
+import state_machine
 
 # ---SwarmCast decentralized aggregation algorithm---
 
@@ -19,7 +22,7 @@ robotInfo = {
 
 TWaiting = 3            # Waiting time in sec.
 TAvoiding = 5           # Avoiding time in sec.
-goalNumber = 2          # Total aggregation goal number.
+goalNumber = 3          # Total aggregation goal number.
 
 # During the aggregation the robot has 2 states (behaviours). The search and the wait state.
 # The search state is when the robot is searching for another robot, so that it can start or join an aggregation with another robot.
@@ -57,8 +60,8 @@ def search():
             while time.time() < tEnd:
                 robot.step(robot.timestep)
                 print("Avoiding obstacles")
-                # TODO: rotate and look for a free direction,
-                #       move forward in a free random direction and avoid obstacles
+
+                collisionAvoidance()
 
 
 def wait():
@@ -78,10 +81,14 @@ def wait():
         # If an object is detected, listen for new messages. If not, break out of loop.
         if detected:
             if robot.receiver.getQueueLength() > 0:
-                rawData = robot.receiver.getData().decode()
-                receivedMessage = json.loads(rawData)
-                message = receivedMessage
-                robot.receiver.nextPacket()
+                # TODO: adjust receiver signal strenght, so that communication happens only in close proximity
+                if robot.receiver.getSignalStrength() > 3.0:
+                    print("Signal strenght: ",
+                          robot.receiver.getSignalStrength())
+                    rawData = robot.receiver.getData().decode()
+                    receivedMessage = json.loads(rawData)
+                    message = receivedMessage
+                    robot.receiver.nextPacket()
         elif not detected:
             print("None object detected, breaking out of WTimer loop")
             break
@@ -206,8 +213,8 @@ def waitToSearch():
     while time.time() < tEnd:
         robot.step(robot.timestep)
         print("Avoiding obstacles")
-        # TODO: rotate and look for a free direction,
-        #       move forward in a free random direction and avoid obstacles
+
+        collisionAvoidance()
 
     search()
 
@@ -221,7 +228,7 @@ def readSensors():
         dsValues.append(robot.ds[i].getValue())
 
     for values in dsValues:
-        if values <= 50:
+        if values <= 60:
             detected = True
     return detected
 
@@ -258,11 +265,27 @@ def getMessage():
         print("Waiting for response")
 
         if robot.receiver.getQueueLength() > 0:
-            rawData = robot.receiver.getData().decode()
-            receivedMessage = json.loads(rawData)
-            robot.receiver.nextPacket()
-            break
+            print("Signal strenght: ", robot.receiver.getSignalStrength())
+
+            # TODO: adjust receiver signal strenght, so that communication happens only in close proximity
+            if robot.receiver.getSignalStrength() > 3.0:
+                rawData = robot.receiver.getData().decode()
+                receivedMessage = json.loads(rawData)
+                robot.receiver.nextPacket()
+                break
     return receivedMessage
+
+
+def collisionAvoidance():
+    dsValues = []
+    for i in range(8):
+        dsValues.append(robot.ds[i].getValue())
+    thread = threading.Thread(
+        target=dSLogic.dSPoints(dsValues, state_machine.state))
+    thread.start()
+
+    state_machine.state = state_machine.get_next_state()
+    state_machine.execute_state()
 
 
 def run():

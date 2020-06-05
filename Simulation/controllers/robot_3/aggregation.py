@@ -14,9 +14,9 @@ import state_machine
 
 # Robot aggregation attributes.
 robotInfo = {
-    "R-ID": 1,
-    "ID-List": [1],
-    "G-ID": 1,
+    "R-ID": 3,
+    "ID-List": [3],
+    "G-ID": 3,
     "G-Size": 1
 }
 
@@ -33,7 +33,7 @@ def search():
     print("Searching state")
 
     # Move forward in a random direction
-    robot.move("S")
+    robot.move("W")
 
     detected = readSensors()
 
