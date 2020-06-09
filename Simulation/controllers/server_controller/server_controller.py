@@ -17,13 +17,13 @@ from stateDefs import BotState as BotState
 from stateDefs import ServerState as ServerState
 
 TIME_STEP = 32
-POS_TOLERANCE = 0.05
-GRID_SIZE = 3
+POS_TOLERANCE = 0.05    #deviation tolerance for target
+GRID_SIZE = 3           #n * n grid (must be uneven)
 GRID_ORIGIN = 0
-GRID_SPACING = 1
+GRID_SPACING = 1        #distance between bots
 MAX_SHELL = (GRID_SIZE - 1) / 2
 GRID_POSITIONS = []
-SWAP_TOLERANCE = 0.35
+SWAP_LIMIT = 0.35       #distance between bots swap occurs
 
 ENABLE_SHELLING = True
 
@@ -59,6 +59,10 @@ supervisor = Supervisor()
 root = supervisor.getRoot()
 root_children = root.getField("children")
 
+emitter = supervisor.getEmitter("emitter")
+receiver = supervisor.getReceiver("receiver")
+receiver.enable(TIME_STEP)
+
 def get_random_coordinates():
     x, z = -2, -2
     while(True):
@@ -66,14 +70,11 @@ def get_random_coordinates():
         x = -3 if x > 3 else x + 0.8 + (random.randint(0, 3) / 10)
         z = z + 1.5 if x == -3 else z + (random.randint(-3, 3) / 10) 
 
+#spawn required bots at random positions
 coordinate_generator = get_random_coordinates()
 for i in range(GRID_SIZE**2):
     x, z = next(coordinate_generator)
     root_children.importMFNodeFromString(-1, f"OmniBot {{translation {x} 0.06 {z}}}")
-
-emitter = supervisor.getEmitter("emitter")
-receiver = supervisor.getReceiver("receiver")
-receiver.enable(TIME_STEP)
 
 # Simple pythagorean distance between 2 points
 def distance_between(p1, p2):
@@ -142,7 +143,7 @@ def get_state(bot):
 
     close_bots = [other_bot for other_bot in bots
                   if bot.id != other_bot.id
-                  and distance_between(bot.position, other_bot.position) < SWAP_TOLERANCE]
+                  and distance_between(bot.position, other_bot.position) < SWAP_LIMIT]
 
     for other_bot in close_bots:
         if not have_swapped(bot, other_bot):
@@ -171,7 +172,7 @@ def get_state(bot):
 
     return BotState.IN_FORMATION
 
-# Determine whether all bots that belong to the current shell are currently in formation
+### Determine whether all bots that belong to the current shell are currently in formation
 def current_shell_in_formation():
     bots_in_current_shell = [bot for bot in bots if bot.shell == current_shell]
     return all(bot.state == BotState.IN_FORMATION for bot in bots_in_current_shell)
@@ -192,16 +193,17 @@ def get_next_offset():
         i = i + 0.5
         yield offset
 
-
 offset_generator = get_next_offset()
-
+###
 
 if GRID_SIZE % 2 == 0:
     raise Exception("GRID_SIZE should be set to be an even number.")
 
+### system loop starts here
 while supervisor.step(TIME_STEP) != -1:
 
     while receiver.getQueueLength() > 0:
+        #receive bot attributes
         bot = None
         raw_data = receiver.getData()
         (id, message) = pickle.loads(raw_data)
@@ -209,30 +211,35 @@ while supervisor.step(TIME_STEP) != -1:
         dsValues = message.get("dsValues")
         heading = message.get("heading")
         emitter.setChannel(id)
-            
+        
+        #check if bot is registered
         if id in [bot.id for bot in bots]:
+            #if server is no longer looking for new bots
             if server_state != ServerState.WAITING_FOR_CONNECTIONS:
+                #send command
                 bot = next(bot for bot in bots if bot.id == id)
                 bot.set_position(np.array(position))
                 bot.set_dsValues(dsValues)
                 bot.set_heading(heading)
                 bot.set_state(get_state(bot))
 
-                cd.scan(bot)
+                cd.scan(bot) #collision detection/avoidance
 
                 downlink_data = (bot.state, bot.color)
                 send_message(downlink_data)
-
+        #register new bot
         else:
             bot = Bot(id=id, position=np.array(position))
             bots.append(bot)
-
+        #check for new messages
         receiver.nextPacket()
-
+    
+    #register bots
     if server_state == ServerState.WAITING_FOR_CONNECTIONS and len(bots) == GRID_SIZE**2:
         server_state = ServerState.CALCULATING_OPTIMAL_ASSIGNMENT
         calculate_optimal_assignment()
 
+    #continue with next shell or start moving as swarm
     if current_shell_in_formation():
         if current_shell == MAX_SHELL:
             server_state = ServerState.MOVING_AS_SWARM
@@ -240,6 +247,7 @@ while supervisor.step(TIME_STEP) != -1:
         if server_state == ServerState.WAITING_FOR_FORMATION:
             current_shell += 1
 
+    #calculate next target of bots in swarm
     if server_state == ServerState.MOVING_AS_SWARM and all_bots_in_formation():
         offset = next(offset_generator)
         offset_all_bots(offset)

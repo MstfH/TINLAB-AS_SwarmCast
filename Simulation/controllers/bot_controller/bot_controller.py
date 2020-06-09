@@ -13,6 +13,7 @@ ID = random.randint(1, 1000000)
 direction = None
 color = None
 
+### webots node inits
 supervisor = Supervisor()
 robot_node = supervisor.getSelf()
 translation_field = robot_node.getField("translation")
@@ -23,17 +24,7 @@ receiver.enable(TIME_STEP)
 receiver.setChannel(ID)
 compass = supervisor.getCompass("compass")
 compass.enable(TIME_STEP)
-
-##populate list of distance sensors
-ds = []
-dsNames = [
-    'ds0', 'ds1', 'ds2', 'ds3',
-    'ds4', 'ds5', 'ds6', 'ds7'
-]
-for i in range(8):
-    ds.append(supervisor.getDistanceSensor(dsNames[i]))
-    ds[i].enable(TIME_STEP)
-##
+led = supervisor.getLED("led")
 
 wheels = [
     supervisor.getMotor("wheel1"),
@@ -44,8 +35,20 @@ wheels = [
 for wheel in wheels:
     wheel.setPosition(float('inf'))
     wheel.setVelocity(0.0)
+###
 
-led = supervisor.getLED("led")
+### populate list of distance sensors
+ds = []
+dsNames = [
+    'ds0', 'ds1', 'ds2', 'ds3',
+    'ds4', 'ds5', 'ds6', 'ds7'
+]
+for i in range(8):
+    ds.append(supervisor.getDistanceSensor(dsNames[i]))
+    ds[i].enable(TIME_STEP)
+###
+
+
 
 def readSensors():
     # reads sensors and returns list of sensor values
@@ -60,7 +63,8 @@ def readSensors():
 
 def send_message(message):
     emitter.send(pickle.dumps((ID, message)))
-    
+
+### wheel movements per command
 def cw():
     wheels[0].setVelocity(1)
     wheels[1].setVelocity(1)
@@ -70,10 +74,6 @@ def ccw():
     wheels[0].setVelocity(-1)
     wheels[1].setVelocity(-1)
     wheels[2].setVelocity(-1)
-    
-def set_color(color):
-    led.set(int(color, 16))
-
 
 def stop_wheels():
     wheels[0].setVelocity(0)
@@ -103,7 +103,12 @@ def move_west():
     wheels[0].setVelocity(2 * SPEED_FACTOR)
     wheels[1].setVelocity(-SPEED_FACTOR)
     wheels[2].setVelocity(-SPEED_FACTOR)
+###
 
+def set_color(color):
+    led.set(int(color, 16))
+
+### commands per state
 def move(direction):
     move_map = {
         BotState.IDLE: stop_wheels,
@@ -119,17 +124,22 @@ def move(direction):
     func = move_map.get(direction)
     func()
 
+### main loop
 while supervisor.step(TIME_STEP) != -1:
 
+    #print ID when selected in webots simulation
     if supervisor.getSelected() and supervisor.getSelected().getId() == supervisor.getSelf().getId():
         print(f"Selected: <{ID}> {direction}")
 
+    #receive command
     while receiver.getQueueLength() > 0:
+        #parse command
         raw_data = receiver.getData()
         direction, color = pickle.loads(raw_data)
         move(direction)
         set_color(color)
         receiver.nextPacket()
+    #read attributed
     dsValues = readSensors()
     current_position = translation_field.getSFVec3f()
     (x, _, z) = current_position
@@ -137,9 +147,11 @@ while supervisor.step(TIME_STEP) != -1:
     heading = round(heading,5)
     x = round(x,3)
     z = round(z,3)
+    #send attributes to server
     message = {
         "position" : [x, z],
         "dsValues" : dsValues,
         "heading" : heading
         }
     send_message(message)
+###
