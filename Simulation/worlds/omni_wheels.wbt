@@ -4,7 +4,6 @@ WorldInfo {
     "Thanks to Mehdi Ghanavati, Shahid Chamran University"
   ]
   title "Omni-wheels"
-  basicTimeStep 8
 }
 Viewpoint {
   orientation 1 0 0 4.71238898038469

@@ -9,6 +9,7 @@ class ServerState(Enum):
 
 class BotState(Enum):
     IDLE = 'I'
+    EMERGENCY_BRAKE = 'EB'
     TRAVELLING_NORTH = 'N'
     TRAVELLING_EAST = 'E'
     TRAVELLING_SOUTH = 'S'
