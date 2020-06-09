@@ -6,17 +6,15 @@ sys.path.append('..')
 from stateDefs import ServerState as ServerState
 from stateDefs import BotState as BotState
 
-SWAPS_BEFORE_RESET = 2
+SWAPS_BEFORE_RESET = 2 #how many total swaps can be made before swap between oldest ID's is allowed
 
 class Bot:
-
     def __init__(self, id, position):
         print(f"Registered bot {id} @ {position}")
         self.id = id
         self.position = position
         self.target = None
         self.shell = None
-        self.swapped_with = []
         self.swapdeque = deque(maxlen = SWAPS_BEFORE_RESET)
         self.state = BotState.IDLE
         self.heading = 0
