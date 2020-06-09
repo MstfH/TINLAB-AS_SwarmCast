@@ -23,9 +23,9 @@ GRID_ORIGIN = 0
 GRID_SPACING = 1
 MAX_SHELL = (GRID_SIZE - 1) / 2
 GRID_POSITIONS = []
-SWAP_TOLERANCE = 0.35 #was 0.5
+SWAP_TOLERANCE = 0.35
 
-ENABLE_SHELLING = False
+ENABLE_SHELLING = True
 
 HEADING_CORR_TOLERANCE = 0.10
 
@@ -117,7 +117,6 @@ def send_message(message):
 
 # Determine whether 2 bots have swapped in the past
 def have_swapped(b1, b2):
-    #return b2 in b1.swapped_with or b1 in b2.swapped_with
     return b2 in b1.swapdeque or b1 in b2.swapdeque
 
 # Swap the target, state and shell properties of 2 bots
@@ -129,13 +128,11 @@ def swap(b1, b2):
     b1.set_target(b2.target)
     b1.set_shell(b2.shell)
     b1.set_color(b2.color)
-    #b1.append_swapped(b2)
     b1.append_swapdeque(b2)
     
     b2.set_target(target)
     b2.set_shell(shell)
     b2.set_color(color)
-    #b2.append_swapped(b1)
     b2.append_swapdeque(b1)
 
 # Determine the next state for a bot, based on its own and other bot's properties
@@ -207,8 +204,6 @@ while supervisor.step(TIME_STEP) != -1:
     while receiver.getQueueLength() > 0:
         bot = None
         raw_data = receiver.getData()
-        (id, position) = pickle.loads(raw_data)
-        #print(pickle.loads(raw_data))
         (id, message) = pickle.loads(raw_data)
         position = message.get("position")
         dsValues = message.get("dsValues")

@@ -12,7 +12,6 @@ from stateDefs import BotState as BotState
 collision_queue = {}
 proximityLimit = 100
 
-#sensorKey=[BotState.TRAVELLING_EAST,5,6,7,0,1,2,3]
 movementKey={
     #sensor(s) : direction when tripped
     tuple([0]) :       BotState.TRAVELLING_WEST,
@@ -79,22 +78,4 @@ def scan(bot):
             collision_queue.update({ID : collisionAngles})
 
             avoidCollision(bot, collisionAngles)
-
-            # if max(collision_queue, key=int) == ID:
-            #     print(ID, "higher priority, avoiding")
-            #     avoidCollision(bot, collisionAngles)
-            #     bot.update({
-            #                 "stateBeforeCollision": None,
-            #                 "collision": None
-            #     })
-
-        
-        # if len(collision_queue) > 1:
-        #     if (max(collision_queue, key=int) == ID):
-        #         print(ID, "higher priority, continuing")
-        #         bot.update({
-        #             "state": BotState.BRAKE_RELEASED,
-        #             "collision": None
-        #         })
-        #         collision_queue.pop(max(collision_queue))
     return
