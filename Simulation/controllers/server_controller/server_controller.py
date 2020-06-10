@@ -42,6 +42,7 @@ SWAP_LIMIT = 0.4                 #distance at which bots may swap
 ENABLE_SHELLING = False          #whether to use shelling. shelling improves grid assimilation times when GRID_SPACING is very small
 HEADING_CORR_TOLERANCE = 0.10    #tolerance between a bot's heading and absolute north
 BOT_SPREAD = 0.5                 #number from 0 to 1 to determine dispersion of bots   
+LED_SIZE = GRID_SPACING          #size of the LED on the bot
 
 server_state = ServerState.WAITING_FOR_CONNECTIONS
 
@@ -76,7 +77,7 @@ def get_random_coordinates():
 coordinate_generator = get_random_coordinates()
 for i in range(GRID_SIZE**2):
     x, y = next(coordinate_generator)
-    root_children.importMFNodeFromString(-1, f"OmniBot {{translation {x} 0.06 {y}}}")
+    root_children.importMFNodeFromString(-1, f"OmniBot {{translation {x} 0.06 {y} led_size {LED_SIZE} 0.01 {LED_SIZE}}}")
 
 # Determine how many steps a given point on the grid is removed from its center
 def get_shell(point):
