@@ -36,12 +36,12 @@ GRID_POSITIONS = []
 
 
 POS_TOLERANCE = 0.05             #deviation tolerance for target
-GRID_SPACING = 0.5               #distance between bots
+GRID_SPACING = 0.8               #distance between bots
 GRID_CENTER = None               #you may optionally set this to the desired center of the grid
 SWAP_LIMIT = 0.4                 #distance at which bots may swap
 ENABLE_SHELLING = False           #whether to use shelling. shelling improves grid assimilation times when GRID_SPACING is very small
 HEADING_CORR_TOLERANCE = 0.10    #tolerance between a bot's heading and absolute north
-    
+
 server_state = ServerState.WAITING_FOR_CONNECTIONS
 
 current_shell = 0
@@ -105,7 +105,7 @@ def calculate_optimal_assignment():
     
     server_state = ServerState.WAITING_FOR_FORMATION
 
-
+# Serialize data and transmit message to bot
 def send_message(message):
     emitter.send(pickle.dumps(message))
 
@@ -169,20 +169,23 @@ def get_state(bot):
 
     return BotState.IN_FORMATION
 
-### Determine whether all bots that belong to the current shell are currently in formation
+# Determine whether all bots that belong to the current shell are currently in formation
 def current_shell_in_formation():
     bots_in_current_shell = [bot for bot in bots if bot.shell == current_shell]
     return all(bot.state == BotState.IN_FORMATION for bot in bots_in_current_shell)
 
+# Determine whether all bots are in formation
 def all_bots_in_formation():
     return all(bot.state == BotState.IN_FORMATION for bot in bots)
 
+# Shift the target of all bots by a certain delta
 def offset_all_bots(point):
     point_x, point_y = point
     for bot in bots:
         target_x, target_y = bot.target
         bot.target = (target_x + point_x, target_y + point_y)
 
+# Generator function to iterate through directions sequentially
 def get_next_offset():
     i = 0
     while True:
@@ -191,11 +194,12 @@ def get_next_offset():
         yield offset
 
 offset_generator = get_next_offset()
-###
 
+# Calculate average of a list of numbers
 def avg(nums):
     return sum(nums) / len(nums)
 
+# Initialize the grid and assign colors once all bots have connected
 def construct_grid():
     global GRID_CENTER, GRID_POSITIONS
     
