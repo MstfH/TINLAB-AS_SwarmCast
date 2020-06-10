@@ -7,7 +7,8 @@ import sys
 sys.path.append('..')
 from stateDefs import BotState as BotState
 
-SPEED_FACTOR = 3
+MOVE_FACTOR = 3
+SPIN_FACTOR = 1
 TIME_STEP = 32
 ID = random.randint(1, 1000000)
 direction = None
@@ -35,46 +36,21 @@ wheels = [
 for wheel in wheels:
     wheel.setPosition(float('inf'))
     wheel.setVelocity(0.0)
-###
 
-### populate list of distance sensors
-ds = []
-dsNames = [
-    'ds0', 'ds1', 'ds2', 'ds3',
-    'ds4', 'ds5', 'ds6', 'ds7'
-]
-for i in range(8):
-    ds.append(supervisor.getDistanceSensor(dsNames[i]))
-    ds[i].enable(TIME_STEP)
-###
-
-
+# populate list of distance sensors
+ds = [supervisor.getDistanceSensor(f"ds{i}") for i in range(8)]
+for sensor in ds: sensor.enable(TIME_STEP)
 
 def readSensors():
     # reads sensors and returns list of sensor values
-    dsValues = []
-    for i in range(8):
-        value = round(ds[i].getValue(), 2)
-        if(value == 1000):
-            value = -1
-        dsValues.append(value)
-    return dsValues
+    raw_values = [sensor.getValue() for sensor in ds]
+    return [-1 if value == 1000 else round(value, 2) for value in raw_values]
 
 
 def send_message(message):
     emitter.send(pickle.dumps((ID, message)))
 
 ### wheel movements per command
-def cw():
-    wheels[0].setVelocity(1)
-    wheels[1].setVelocity(1)
-    wheels[2].setVelocity(1)
-
-def ccw():
-    wheels[0].setVelocity(-1)
-    wheels[1].setVelocity(-1)
-    wheels[2].setVelocity(-1)
-
 def stop_wheels():
     wheels[0].setVelocity(0)
     wheels[1].setVelocity(0)
@@ -83,27 +59,37 @@ def stop_wheels():
 
 def move_north():
     wheels[0].setVelocity(0)
-    wheels[1].setVelocity(-SPEED_FACTOR)
-    wheels[2].setVelocity(SPEED_FACTOR)
+    wheels[1].setVelocity(-MOVE_FACTOR)
+    wheels[2].setVelocity(MOVE_FACTOR)
 
 
 def move_east():
-    wheels[0].setVelocity(-2 * SPEED_FACTOR)
-    wheels[1].setVelocity(SPEED_FACTOR)
-    wheels[2].setVelocity(SPEED_FACTOR)
+    wheels[0].setVelocity(-2 * MOVE_FACTOR)
+    wheels[1].setVelocity(MOVE_FACTOR)
+    wheels[2].setVelocity(MOVE_FACTOR)
 
 
 def move_south():
     wheels[0].setVelocity(0)
-    wheels[1].setVelocity(SPEED_FACTOR)
-    wheels[2].setVelocity(-SPEED_FACTOR)
+    wheels[1].setVelocity(MOVE_FACTOR)
+    wheels[2].setVelocity(-MOVE_FACTOR)
 
 
 def move_west():
-    wheels[0].setVelocity(2 * SPEED_FACTOR)
-    wheels[1].setVelocity(-SPEED_FACTOR)
-    wheels[2].setVelocity(-SPEED_FACTOR)
-###
+    wheels[0].setVelocity(2 * MOVE_FACTOR)
+    wheels[1].setVelocity(-MOVE_FACTOR)
+    wheels[2].setVelocity(-MOVE_FACTOR)
+
+def rotate_cw():
+    wheels[0].setVelocity(1 * SPIN_FACTOR)
+    wheels[1].setVelocity(1 * SPIN_FACTOR)
+    wheels[2].setVelocity(1 * SPIN_FACTOR)
+
+def rotate_ccw():
+    wheels[0].setVelocity(-1 * SPIN_FACTOR)
+    wheels[1].setVelocity(-1 * SPIN_FACTOR)
+    wheels[2].setVelocity(-1 * SPIN_FACTOR)
+
 
 def set_color(color):
     led.set(int(color, 16))
@@ -118,13 +104,12 @@ def move(direction):
         BotState.TRAVELLING_WEST: move_west,
         BotState.IN_FORMATION: stop_wheels,
         BotState.EMERGENCY_BRAKE: stop_wheels,
-        BotState.TURNING_CW: cw,
-        BotState.TURNING_CCW: ccw
+        BotState.TURNING_CW: rotate_cw,
+        BotState.TURNING_CCW: rotate_ccw
     }
     func = move_map.get(direction)
     func()
 
-### main loop
 while supervisor.step(TIME_STEP) != -1:
 
     #print ID when selected in webots simulation
@@ -139,7 +124,7 @@ while supervisor.step(TIME_STEP) != -1:
         move(direction)
         set_color(color)
         receiver.nextPacket()
-    #read attributed
+    #read attributes
     dsValues = readSensors()
     current_position = translation_field.getSFVec3f()
     (x, _, z) = current_position
@@ -152,6 +137,5 @@ while supervisor.step(TIME_STEP) != -1:
         "position" : [x, z],
         "dsValues" : dsValues,
         "heading" : heading
-        }
+    }
     send_message(message)
-###

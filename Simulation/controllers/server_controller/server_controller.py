@@ -16,17 +16,29 @@ sys.path.append('..')
 from stateDefs import BotState as BotState
 from stateDefs import ServerState as ServerState
 
+PIXEL_MAP = {}
+IMAGE_NAME = "rainbow.png"
+IMAGE = Image.open(IMAGE_NAME)
+IMAGE_WIDTH, IMAGE_HEIGHT = IMAGE.size
+
+if IMAGE_WIDTH != IMAGE_HEIGHT:
+    raise Exception("Error: Image is not rectangular")
+
+if IMAGE_WIDTH % 2 != 1 or IMAGE_HEIGHT %  2 != 1:
+    raise Exception("Error: Image width and height must both be an uneven number")
+
+IMAGE_DATA = np.asarray(IMAGE)
+IMAGE_DATA = IMAGE_DATA.reshape(IMAGE_WIDTH**2, 3)
+
 TIME_STEP = 32
 POS_TOLERANCE = 0.05    #deviation tolerance for target
-GRID_SIZE = 3           #n * n grid (must be uneven)
-GRID_ORIGIN = 0
-GRID_SPACING = 1        #distance between bots
+GRID_SIZE = IMAGE_WIDTH
+GRID_ORIGIN = 0        #x and y coordinates of the most northwestern bot
+GRID_SPACING = 1       #distance between bots
 MAX_SHELL = (GRID_SIZE - 1) / 2
 GRID_POSITIONS = []
-SWAP_LIMIT = 0.35       #distance between bots swap occurs
-
-ENABLE_SHELLING = True
-
+SWAP_LIMIT = 0.4       #distance between bots swap occurs
+ENABLE_SHELLING = False
 HEADING_CORR_TOLERANCE = 0.10
 
 for x in range(GRID_SIZE):
@@ -38,12 +50,6 @@ for x in range(GRID_SIZE):
 
 GRID_POSITIONS = np.array(GRID_POSITIONS)
 print(GRID_POSITIONS)
-
-PIXEL_MAP = {}
-IMAGE_NAME = "flag.png"
-image = Image.open(IMAGE_NAME)
-IMAGE_DATA = np.asarray(image)
-IMAGE_DATA = IMAGE_DATA.reshape(GRID_SIZE**2, 3)
 
 for color_value, position in zip(IMAGE_DATA, GRID_POSITIONS):
     color = '0x%02x%02x%02x' % tuple(color_value)
@@ -158,17 +164,21 @@ def get_state(bot):
     if bot.shell > current_shell and ENABLE_SHELLING:
         return BotState.IDLE
 
+    movement_candidates = []
     if pos_y - target_y > POS_TOLERANCE:
-        return BotState.TRAVELLING_NORTH
+        movement_candidates.append(BotState.TRAVELLING_NORTH)
 
     if target_x - pos_x > POS_TOLERANCE:
-        return BotState.TRAVELLING_EAST
+        movement_candidates.append(BotState.TRAVELLING_EAST)
 
     if target_y - pos_y > POS_TOLERANCE:
-        return BotState.TRAVELLING_SOUTH
+        movement_candidates.append(BotState.TRAVELLING_SOUTH)
 
     if pos_x - target_x > POS_TOLERANCE:
-        return BotState.TRAVELLING_WEST
+        movement_candidates.append(BotState.TRAVELLING_WEST)
+
+    if len(movement_candidates) > 0:
+        return random.choice(movement_candidates)
 
     return BotState.IN_FORMATION
 
@@ -195,9 +205,6 @@ def get_next_offset():
 
 offset_generator = get_next_offset()
 ###
-
-if GRID_SIZE % 2 == 0:
-    raise Exception("GRID_SIZE should be set to be an even number.")
 
 ### system loop starts here
 while supervisor.step(TIME_STEP) != -1:

@@ -7,7 +7,7 @@ from stateDefs import BotState as BotState
 import numpy as np
 
 collision_queue = {}
-PROXIMITY_LIMIT = 100
+PROXIMITY_LIMIT = 80
 
 '''
 sensor(s)   :   direction to travel when tripped
