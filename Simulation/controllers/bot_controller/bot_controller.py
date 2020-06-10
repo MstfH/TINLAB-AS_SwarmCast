@@ -7,12 +7,13 @@ import sys
 sys.path.append('..')
 from stateDefs import BotState as BotState
 
-MOVE_FACTOR = 3
-SPIN_FACTOR = 1
-TIME_STEP = 32
 ID = random.randint(1, 1000000)
+TIME_STEP = 32
 direction = None
 color = None
+
+MOVE_FACTOR = 3    #factor to influence the speed of the wheels when traveling
+SPIN_FACTOR = 1    #factor to influence the speed of the wheels when spinning
 
 ### webots node inits
 supervisor = Supervisor()
