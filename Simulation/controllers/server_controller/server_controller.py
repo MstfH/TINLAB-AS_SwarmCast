@@ -39,8 +39,9 @@ POS_TOLERANCE = 0.05             #deviation tolerance for target
 GRID_SPACING = 0.8               #distance between bots
 GRID_CENTER = None               #you may optionally set this to the desired center of the grid
 SWAP_LIMIT = 0.4                 #distance at which bots may swap
-ENABLE_SHELLING = False           #whether to use shelling. shelling improves grid assimilation times when GRID_SPACING is very small
+ENABLE_SHELLING = False          #whether to use shelling. shelling improves grid assimilation times when GRID_SPACING is very small
 HEADING_CORR_TOLERANCE = 0.10    #tolerance between a bot's heading and absolute north
+BOT_SPREAD = 0.5                 #number from 0 to 1 to determine dispersion of bots   
 
 server_state = ServerState.WAITING_FOR_CONNECTIONS
 
@@ -56,24 +57,26 @@ emitter = supervisor.getEmitter("emitter")
 receiver = supervisor.getReceiver("receiver")
 receiver.enable(TIME_STEP)
 
-def get_random_coordinates():
-    x, z = -3, -3
-    while(True):
-        yield (x, z)
-        x = -4 if x > 3.5 else x + 0.8 + (random.randint(0, 3) / 10)
-        z = z + 2 if x == -4 else z + (random.randint(-5, 5) / 10) 
-
-#spawn required bots at random positions
-coordinate_generator = get_random_coordinates()
-for i in range(GRID_SIZE**2):
-    x, z = next(coordinate_generator)
-    root_children.importMFNodeFromString(-1, f"OmniBot {{translation {x} 0.06 {z}}}")
-
 # Simple pythagorean distance between 2 points
 def distance_between(p1, p2):
     x1, y1 = p1
     x2, y2 = p2
     return math.sqrt((x1 - x2)**2 + (y1 - y2)**2)
+
+def get_random_coordinates():
+    coordinate_buffer = []
+    while(True):
+        x = random.randint(int(-45 * BOT_SPREAD), int(45 * BOT_SPREAD)) / 10 
+        y = random.randint(int(-45 * BOT_SPREAD), int(45 * BOT_SPREAD)) / 10
+        if len([c for c in coordinate_buffer if distance_between(c, (x, y)) < 0.5]) == 0:
+            coordinate_buffer.append((x, y))
+            yield (x, y)
+
+#spawn required bots at random positions
+coordinate_generator = get_random_coordinates()
+for i in range(GRID_SIZE**2):
+    x, y = next(coordinate_generator)
+    root_children.importMFNodeFromString(-1, f"OmniBot {{translation {x} 0.06 {y}}}")
 
 # Determine how many steps a given point on the grid is removed from its center
 def get_shell(point):
