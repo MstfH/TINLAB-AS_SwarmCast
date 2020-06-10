@@ -19,6 +19,9 @@ class Bot:
         self.state = BotState.IDLE
         self.heading = 0
         self.color = "0x000000"
+        self.dsValues = []
+        self.stateBeforeCollision = BotState.IDLE
+        self.collision = None
 
     def set_position(self, position): 
         self.position = position
@@ -28,9 +31,6 @@ class Bot:
 
     def set_shell(self, shell):
         self.shell = shell
-
-    def append_swapped(self, bot):
-        self.swapped_with.append(bot)
     
     def append_swapdeque(self, bot):
         self.swapdeque.append(bot)

@@ -12,6 +12,7 @@ Viewpoint {
 TexturedBackground {
 }
 TexturedBackgroundLight {
+  luminosity 0
   castShadows FALSE
 }
 RectangleArena {

@@ -1,5 +1,6 @@
 PROTO OmniBot [
   field SFVec3f    translation  0 0.06 0
+  field SFVec3f    led_size     0.12 0.01 0.12
   field SFString   controller   "bot_controller"
 ]
 {
@@ -812,7 +813,7 @@ PROTO OmniBot [
                 metalness 0
             }
             geometry Box {
-                size 0.12 0.01 0.12
+                size IS led_size
             }
             }
         ]
