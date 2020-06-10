@@ -29,31 +29,18 @@ if IMAGE_WIDTH % 2 != 1 or IMAGE_HEIGHT %  2 != 1:
 
 IMAGE_DATA = np.asarray(IMAGE)
 IMAGE_DATA = IMAGE_DATA.reshape(IMAGE_WIDTH**2, 3)
-
 TIME_STEP = 32
-POS_TOLERANCE = 0.05    #deviation tolerance for target
 GRID_SIZE = IMAGE_WIDTH
-GRID_ORIGIN = 0        #x and y coordinates of the most northwestern bot
-GRID_SPACING = 1       #distance between bots
 MAX_SHELL = (GRID_SIZE - 1) / 2
 GRID_POSITIONS = []
-SWAP_LIMIT = 0.4       #distance between bots swap occurs
-ENABLE_SHELLING = False
-HEADING_CORR_TOLERANCE = 0.10
 
-for x in range(GRID_SIZE):
-    for y in range(GRID_SIZE):
-        GRID_POSITIONS.append([
-            GRID_ORIGIN + x * GRID_SPACING,
-            GRID_ORIGIN + y * GRID_SPACING
-        ])
 
-GRID_POSITIONS = np.array(GRID_POSITIONS)
-print(GRID_POSITIONS)
-
-for color_value, position in zip(IMAGE_DATA, GRID_POSITIONS):
-    color = '0x%02x%02x%02x' % tuple(color_value)
-    PIXEL_MAP.update({tuple(position): color})
+POS_TOLERANCE = 0.05             #deviation tolerance for target
+GRID_SPACING = 0.5               #distance between bots
+GRID_CENTER = None               #you may optionally set this to the desired center of the grid
+SWAP_LIMIT = 0.4                 #distance at which bots may swap
+ENABLE_SHELLING = False           #whether to use shelling. shelling improves grid assimilation times when GRID_SPACING is very small
+HEADING_CORR_TOLERANCE = 0.10    #tolerance between a bot's heading and absolute north
     
 server_state = ServerState.WAITING_FOR_CONNECTIONS
 
@@ -91,9 +78,9 @@ def distance_between(p1, p2):
 # Determine how many steps a given point on the grid is removed from its center
 def get_shell(point):
     x, y = point
-    center = GRID_ORIGIN + (GRID_SIZE - 1) / 2 * GRID_SPACING
-    delta_x = abs(center - x)
-    delta_y = abs(center - y)
+    center_x, center_y = GRID_CENTER
+    delta_x = abs(center_x - x)
+    delta_y = abs(center_y - y)
     max_delta = max(delta_x, delta_y)
     steps = max_delta / GRID_SPACING
     return steps
@@ -206,6 +193,31 @@ def get_next_offset():
 offset_generator = get_next_offset()
 ###
 
+def avg(nums):
+    return sum(nums) / len(nums)
+
+def construct_grid():
+    global GRID_CENTER, GRID_POSITIONS
+    
+    if GRID_CENTER == None:
+        center_x = avg([bot.position[0] for bot in bots])
+        center_y = avg([bot.position[1] for bot in bots])
+        GRID_CENTER = (center_x, center_y)
+
+    n_outer_layers = int((GRID_SIZE - 1) / 2)
+    for x in range(-n_outer_layers, n_outer_layers  + 1):
+        for y in range(-n_outer_layers, n_outer_layers + 1):
+            GRID_POSITIONS.append([
+                center_x + x * GRID_SPACING,
+                center_y + y * GRID_SPACING
+            ])
+    GRID_POSITIONS = np.array(GRID_POSITIONS)
+    print(GRID_POSITIONS)
+
+    for color_value, position in zip(IMAGE_DATA, GRID_POSITIONS):
+        color = '0x%02x%02x%02x' % tuple(color_value)
+        PIXEL_MAP.update({tuple(position): color})
+
 ### system loop starts here
 while supervisor.step(TIME_STEP) != -1:
 
@@ -243,6 +255,7 @@ while supervisor.step(TIME_STEP) != -1:
     
     #register bots
     if server_state == ServerState.WAITING_FOR_CONNECTIONS and len(bots) == GRID_SIZE**2:
+        construct_grid()
         server_state = ServerState.CALCULATING_OPTIMAL_ASSIGNMENT
         calculate_optimal_assignment()
 
