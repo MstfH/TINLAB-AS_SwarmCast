@@ -139,7 +139,7 @@ def get_state(bot):
                   and distance_between(bot.position, other_bot.position) < SWAP_LIMIT]
 
     for other_bot in close_bots:
-        if not have_swapped(bot, other_bot):
+        if not have_swapped(bot, other_bot) and (bot.shell >= current_shell and other_bot.shell >= current_shell) if ENABLE_SHELLING else True:
             swap(bot, other_bot)
 
     if heading < (0 - HEADING_CORR_TOLERANCE):
