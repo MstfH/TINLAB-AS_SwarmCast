@@ -165,16 +165,16 @@ def get_state(bot):
         return BotState.IDLE
 
     movement_candidates = []
-    if pos_y - target_y > POS_TOLERANCE:
+    if target_y < pos_y and pos_y - target_y > POS_TOLERANCE:
         movement_candidates.append(BotState.TRAVELLING_NORTH)
 
-    if target_x - pos_x > POS_TOLERANCE:
+    if target_x > pos_x and target_x - pos_x > POS_TOLERANCE:
         movement_candidates.append(BotState.TRAVELLING_EAST)
 
-    if target_y - pos_y > POS_TOLERANCE:
+    if target_y > pos_y and target_y - pos_y > POS_TOLERANCE:
         movement_candidates.append(BotState.TRAVELLING_SOUTH)
 
-    if pos_x - target_x > POS_TOLERANCE:
+    if target_x < pos_x and pos_x - target_x > POS_TOLERANCE:
         movement_candidates.append(BotState.TRAVELLING_WEST)
 
     if len(movement_candidates) > 0:
