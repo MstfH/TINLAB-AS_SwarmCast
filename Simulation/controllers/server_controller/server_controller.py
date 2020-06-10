@@ -70,11 +70,11 @@ receiver = supervisor.getReceiver("receiver")
 receiver.enable(TIME_STEP)
 
 def get_random_coordinates():
-    x, z = -2, -2
+    x, z = -3, -3
     while(True):
         yield (x, z)
-        x = -3 if x > 3 else x + 0.8 + (random.randint(0, 3) / 10)
-        z = z + 1.5 if x == -3 else z + (random.randint(-3, 3) / 10) 
+        x = -4 if x > 3.5 else x + 0.8 + (random.randint(0, 3) / 10)
+        z = z + 2 if x == -4 else z + (random.randint(-5, 5) / 10) 
 
 #spawn required bots at random positions
 coordinate_generator = get_random_coordinates()
