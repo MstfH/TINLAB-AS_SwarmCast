@@ -42,7 +42,8 @@ SWAP_LIMIT = 0.4                 #distance at which bots may swap
 ENABLE_SHELLING = False          #whether to use shelling. shelling improves grid assimilation times when GRID_SPACING is very small
 HEADING_CORR_TOLERANCE = 0.10    #tolerance between a bot's heading and absolute north
 BOT_SPREAD = 0.5                 #number from 0 to 1 to determine dispersion of bots   
-LED_SIZE = GRID_SPACING          #size of the LED on the bot
+#LED_SIZE = GRID_SPACING          #size of the LED on the bot
+LED_SIZE = 0.1          #size of the LED on the bot
 
 server_state = ServerState.WAITING_FOR_CONNECTIONS
 
@@ -119,19 +120,21 @@ def have_swapped(b1, b2):
 
 # Swap the target, state and shell properties of 2 bots
 def swap(b1, b2):
-    target = b1.target
-    shell = b1.shell
-    color = b1.color
 
-    b1.set_target(b2.target)
-    b1.set_shell(b2.shell)
-    b1.set_color(b2.color)
-    b1.append_swapdeque(b2)
-    
-    b2.set_target(target)
-    b2.set_shell(shell)
-    b2.set_color(color)
-    b2.append_swapdeque(b1)
+    if b1 not in b2.swapdeque:
+        target = b1.target
+        shell = b1.shell
+        color = b1.color
+
+        b1.set_target(b2.target)
+        b1.set_shell(b2.shell)
+        b1.set_color(b2.color)
+        b1.append_swapdeque(b2)
+        
+        b2.set_target(target)
+        b2.set_shell(shell)
+        b2.set_color(color)
+        b2.append_swapdeque(b1)
 
 # Determine the next state for a bot, based on its own and other bot's properties
 def get_state(bot):
